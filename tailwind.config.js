@@ -6,10 +6,11 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    colors: {
-      "base-green": "#7FD6AA",
-    },
     extend: {
+      colors: {
+        "base-green": "#7FD6AA",
+        "nav-gray": "#D9D9D9",
+      },
       fontFamily: {
         quicksand: ["quicksand", "sans-serif"],
       },
