@@ -1,7 +1,14 @@
-import React from "react";
+import { getProviders, signIn } from "next-auth/react";
+import SignInComponent from "../../../components/SignInComponent";
 
-function SignInPage() {
-  return <div>Test</div>;
+async function SignInPage() {
+    const providers = await getProviders();
+
+    return (
+        <div>
+            <SignInComponent providers={providers} />
+        </div>
+    );
 }
 
 export default SignInPage;
