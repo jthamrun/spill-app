@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { useState, useRef } from "react";
 import { signIn, signOut } from "next-auth/react";
+// import { unstable_getServerSession } from "next-auth/next";
 
 function MainNavigation() {
   const genericHamburgerLine = `h-1 w-6 my-0.5 rounded-full bg-black transition ease transform duration-300`;
@@ -11,6 +12,9 @@ function MainNavigation() {
   const [isMenuOpen, setMenuOpen] = useState<boolean>(false);
   const sideBarRef = useRef<HTMLElement>(null);
   const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
+  // const session = await unstable_getServerSession();
+
+  // console.log(session);
 
   const handleClickOutsideSideBar = (e: any) => {
     if (isMenuOpen && !sideBarRef.current?.contains(e.target as Node)) {

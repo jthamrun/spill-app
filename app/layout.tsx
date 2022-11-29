@@ -1,20 +1,21 @@
+import { unstable_getServerSession } from "next-auth";
 import MainNavigation from "../components/MainNavigation";
 import "../styles/globals.css";
 
-export default function RootLayout({
-    children,
+export default async function RootLayout({
+  children,
 }: {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-    return (
-        <html lang="en">
-            <body>
-                <header>
-                    <MainNavigation />
-                </header>
+  return (
+    <html lang="en">
+      <body>
+        <header>
+          <MainNavigation />
+        </header>
 
-                <main>{children}</main>
-            </body>
-        </html>
-    );
+        {children}
+      </body>
+    </html>
+  );
 }
