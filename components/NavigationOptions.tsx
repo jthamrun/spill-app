@@ -1,14 +1,17 @@
 "use client";
-import { useSession } from "next-auth/react";
+import { unstable_getServerSession } from "next-auth";
 import React, { useState, useRef, useEffect } from "react";
 
-function NavigationOptions() {
+type Props = {
+  session: Awaited<ReturnType<typeof unstable_getServerSession>>;
+};
+
+function NavigationOptions({ session }: Props) {
   const [isMenuOpen, setMenuOpen] = useState<boolean>(false);
   const sideBarRef = useRef<HTMLElement>(null);
   const genericHamburgerLine = `h-1 w-6 my-0.5 rounded-full bg-black transition ease transform duration-300 z-30`;
   const genericSideBar = `transform top-0 right-0 w-80 bg-nav-gray fixed h-full overflow-auto ease-in-out transition-all duration-300 z-10 pt-20 md:hidden`;
-  //   const session = true;
-  const { data: session } = useSession();
+  // const session = false;
 
   const handleClickOutsideSideBar = (e: any) => {
     if (isMenuOpen && !sideBarRef.current?.contains(e.target as Node)) {
@@ -24,7 +27,7 @@ function NavigationOptions() {
     };
   });
 
-  if (session) {
+  if (session)
     return (
       <div className="">
         <div className="hidden text-xs min-[785px]:text-sm md:flex md:space-x-10 font-quicksand font-bold">
@@ -103,49 +106,48 @@ function NavigationOptions() {
         </aside>
       </div>
     );
-  } else {
-    return (
-      <div>
-        <button
-          className="flex flex-col h-10 w-10 rounded justify-center items-center group ml-auto md:hidden"
-          onClick={() => setMenuOpen(!isMenuOpen)}
-        >
-          <div
-            className={`${genericHamburgerLine} ${
-              isMenuOpen
-                ? "rotate-45 translate-y-2 opacity-50 group-hover:opacity-100"
-                : "group-hover:opacity-50"
-            }`}
-          />
-          <div
-            className={`${genericHamburgerLine} ${
-              isMenuOpen ? "opacity-0" : "group-hover:opacity-50"
-            }`}
-          />
-          <div
-            className={`${genericHamburgerLine} ${
-              isMenuOpen
-                ? "-rotate-45 -translate-y-2 opacity-50 group-hover:opacity-100"
-                : "group-hover:opacity-50"
-            }`}
-          />
-        </button>
 
-        <aside
-          className={`${genericSideBar} ${
-            isMenuOpen ? "-translate-x-0" : "translate-x-full"
+  return (
+    <div>
+      <button
+        className="flex flex-col h-10 w-10 rounded justify-center items-center group ml-auto md:hidden"
+        onClick={() => setMenuOpen(!isMenuOpen)}
+      >
+        <div
+          className={`${genericHamburgerLine} ${
+            isMenuOpen
+              ? "rotate-45 translate-y-2 opacity-50 group-hover:opacity-100"
+              : "group-hover:opacity-50"
           }`}
-          ref={sideBarRef}
-        >
-          <button className="ml-12">
-            <p className="transition duration-150 hover:text-green-600 cursor-pointer text-sm">
-              Sign In
-            </p>
-          </button>
-        </aside>
-      </div>
-    );
-  }
+        />
+        <div
+          className={`${genericHamburgerLine} ${
+            isMenuOpen ? "opacity-0" : "group-hover:opacity-50"
+          }`}
+        />
+        <div
+          className={`${genericHamburgerLine} ${
+            isMenuOpen
+              ? "-rotate-45 -translate-y-2 opacity-50 group-hover:opacity-100"
+              : "group-hover:opacity-50"
+          }`}
+        />
+      </button>
+
+      <aside
+        className={`${genericSideBar} ${
+          isMenuOpen ? "-translate-x-0" : "translate-x-full"
+        }`}
+        ref={sideBarRef}
+      >
+        <button className="ml-12">
+          <p className="transition duration-150 hover:text-green-600 cursor-pointer text-sm">
+            Sign In
+          </p>
+        </button>
+      </aside>
+    </div>
+  );
 }
 
 export default NavigationOptions;
