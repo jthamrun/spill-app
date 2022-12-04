@@ -13,7 +13,7 @@ function SignInComponent({ providers }: Props) {
           <button
             onClick={() =>
               signIn(provider.id, {
-                callbackUrl: "http://localhost:3000/dashboard",
+                callbackUrl: "/dashboard",
               })
             }
           >

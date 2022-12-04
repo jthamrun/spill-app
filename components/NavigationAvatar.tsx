@@ -9,14 +9,13 @@ type Props = {
 };
 
 function NavigationAvatar({ session }: Props) {
-  console.log(session);
 
   if (session)
     return (
-      <div>
+      <div className="hidden md:flex">
         <button
           className="cursor-pointer font-quicksand font-bold hover:bg-nav-gray p-2 rounded-md"
-          onClick={() => signOut()}
+          onClick={() => signOut({ callbackUrl: "/" })}
         >
           <p>Sign Out</p>
         </button>
@@ -32,18 +31,12 @@ function NavigationAvatar({ session }: Props) {
     );
 
   return (
-    <div>
+    <div className="hidden md:flex">
       <button
         className="cursor-pointer font-quicksand font-bold hover:bg-nav-gray p-2 rounded-md"
         onClick={() => signIn()}
       >
         <p>Sign In</p>
-      </button>
-      <button
-        className="cursor-pointer font-quicksand font-bold hover:bg-nav-gray p-2 rounded-md"
-        onClick={() => signOut()}
-      >
-        <p>Sign Out</p>
       </button>
     </div>
   );
