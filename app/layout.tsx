@@ -10,6 +10,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="h-screen">
         <header>
+          {/* @ts-expect-error Server Component */}
           <MainNavigation />
         </header>
 
