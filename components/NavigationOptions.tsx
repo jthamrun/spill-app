@@ -31,16 +31,16 @@ function NavigationOptions({ session }: Props) {
     return (
       <div className="">
         <div className="hidden text-xs min-[785px]:text-sm md:flex md:space-x-10 font-quicksand font-bold">
-          <h1 className="transition duration-150 hover:text-slate-50 cursor-pointer">
+          <h1 className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer">
             Create Expense
           </h1>
-          <h1 className="transition duration-150 hover:text-slate-50 cursor-pointer">
+          <h1 className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer">
             Past Expenses
           </h1>
-          <h1 className="transition duration-150 hover:text-slate-50 cursor-pointer">
+          <h1 className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer">
             Friends
           </h1>
-          <h1 className="transition duration-150 hover:text-slate-50 cursor-pointer">
+          <h1 className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer">
             Search People
           </h1>
         </div>
@@ -78,28 +78,28 @@ function NavigationOptions({ session }: Props) {
         >
           <div className="flex flex-col space-y-5 items-start ml-12">
             <button>
-              <p className="transition duration-150 hover:text-green-600 cursor-pointer text-sm">
+              <p className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer text-sm">
                 Create Expense
               </p>
             </button>
             <button>
-              <p className="transition duration-150 hover:text-green-600 cursor-pointer text-sm">
+              <p className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer text-sm">
                 Past Expense
               </p>
             </button>
             <button>
-              <p className="transition duration-150 hover:text-green-600 cursor-pointer text-sm">
+              <p className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer text-sm">
                 Friends
               </p>
             </button>
             <button>
-              <p className="transition duration-150 hover:text-green-600 cursor-pointer text-sm">
+              <p className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer text-sm">
                 Search People
               </p>
             </button>
           </div>
           <button className="ml-12 mt-5">
-            <p className="transition duration-150 hover:text-green-600 cursor-pointer text-sm">
+            <p className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer text-sm">
               Sign Out
             </p>
           </button>
@@ -141,7 +141,7 @@ function NavigationOptions({ session }: Props) {
         ref={sideBarRef}
       >
         <button className="ml-12">
-          <p className="transition duration-150 hover:text-green-600 cursor-pointer text-sm">
+          <p className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer text-sm font-bold">
             Sign In
           </p>
         </button>

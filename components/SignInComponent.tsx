@@ -11,13 +11,16 @@ function SignInComponent({ providers }: Props) {
       {Object.values(providers!).map((provider) => (
         <div key={provider.name}>
           <button
+            className="border-2 border-black rounded-md py-2 px-8 hover:-translate-y-0.5 duration-150 ease-out"
             onClick={() =>
               signIn(provider.id, {
                 callbackUrl: "/dashboard",
               })
             }
           >
-            Sign in with {provider.name}
+            <p className="font-quicksand font-bold text-md md:text-lg">
+              Continue with {provider.name}
+            </p>
           </button>
         </div>
       ))}
