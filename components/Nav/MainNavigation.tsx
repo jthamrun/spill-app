@@ -9,7 +9,7 @@ async function MainNavigation() {
   const session = await unstable_getServerSession();
 
   return (
-    <div className="py-4 px-10 bg-base-green flex items-center justify-between h-[10vh]">
+    <div className="py-4 px-10 bg-base-green flex items-center justify-between h-[10vh] xl:h-[7vh]">
       <Link href="/">
         <h1 className="font-quicksand font-bold text-2xl cursor-pointer transition duration-150 hover:text-slate-50">
           spill.
