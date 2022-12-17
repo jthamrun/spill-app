@@ -2,7 +2,7 @@ import React from "react";
 
 function RecentExpensesRow() {
   return (
-    <tr>
+    <tr className="cursor-pointer hover:bg-black hover:text-white">
       <td>
         <p>10/26/2022</p>
       </td>

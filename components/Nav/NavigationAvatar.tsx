@@ -9,7 +9,6 @@ type Props = {
 };
 
 function NavigationAvatar({ session }: Props) {
-
   if (session)
     return (
       <div className="hidden md:flex">

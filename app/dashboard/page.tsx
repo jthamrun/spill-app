@@ -6,7 +6,7 @@ import RecentExpensesDashboard from "../../components/Dashboard/RecentExpensesDa
 
 function Dashboard() {
   return (
-    <div className="h-[90vh] xl:h-[93vh] px-10 py-5 grid grid-rows-9 md:grid-cols-3 md:grid-rows-5 gap-4 overflow-auto">
+    <div className="h-[90vh] xl:h-[93vh] px-10 py-5 grid grid-rows-9 md:grid-cols-3 md:grid-rows-5 gap-4 overflow-auto xl:max-w-5xl m-auto">
       <QuickActionsDashboard />
       <FriendsStatsDashboard />
       <QuickStatsDashboard />

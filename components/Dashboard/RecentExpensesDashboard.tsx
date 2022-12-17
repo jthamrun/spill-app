@@ -7,7 +7,7 @@ function RecentExpensesDashboard() {
       <h3 className="font-quicksand font-bold text-sm md:text-lg">
         Recent Expenses
       </h3>
-      <div className="flex h-full">
+      <div className="flex h-full md:px-24">
         <table className="m-auto w-full text-center border border-black">
           <thead className="bg-base-green border-y border-black">
             <tr>

@@ -1,6 +1,8 @@
 "use client";
 import { unstable_getServerSession } from "next-auth";
 import React, { useState, useRef, useEffect } from "react";
+import { signIn, signOut } from "next-auth/react";
+import Link from "next/link";
 
 type Props = {
   session: Awaited<ReturnType<typeof unstable_getServerSession>>;
@@ -40,9 +42,11 @@ function NavigationOptions({ session }: Props) {
           <h1 className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer">
             Friends
           </h1>
-          <h1 className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer">
-            Search People
-          </h1>
+          <Link href="/search/people">
+            <h1 className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer">
+              Search People
+            </h1>
+          </Link>
         </div>
 
         <button
@@ -76,7 +80,7 @@ function NavigationOptions({ session }: Props) {
           }`}
           ref={sideBarRef}
         >
-          <div className="flex flex-col space-y-5 items-start ml-12">
+          <div className="flex flex-col space-y-5 items-start ml-12 font-bold font-quicksand">
             <button>
               <p className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer text-sm">
                 Create Expense
@@ -92,14 +96,19 @@ function NavigationOptions({ session }: Props) {
                 Friends
               </p>
             </button>
-            <button>
-              <p className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer text-sm">
-                Search People
-              </p>
-            </button>
+            <Link href="/search/people">
+              <button>
+                <p className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer text-sm">
+                  Search People
+                </p>
+              </button>
+            </Link>
           </div>
-          <button className="ml-12 mt-5">
-            <p className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer text-sm">
+          <button
+            className="ml-12 mt-5"
+            onClick={() => signOut({ callbackUrl: "/" })}
+          >
+            <p className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer text-sm font-bold font-quicksand">
               Sign Out
             </p>
           </button>
@@ -140,7 +149,7 @@ function NavigationOptions({ session }: Props) {
         }`}
         ref={sideBarRef}
       >
-        <button className="ml-12">
+        <button className="ml-12" onClick={() => signIn()}>
           <p className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer text-sm font-bold">
             Sign In
           </p>
