@@ -11,6 +11,7 @@ module.exports = {
         "base-green": "#7FD6AA",
         "light-green": "#73FFB9",
         "nav-gray": "#D9D9D9",
+        "search-bar-gray": "#7B7B7B",
       },
       fontFamily: {
         quicksand: ["quicksand", "sans-serif"],

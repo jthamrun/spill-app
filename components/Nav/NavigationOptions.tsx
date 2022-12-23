@@ -21,11 +21,19 @@ function NavigationOptions({ session }: Props) {
     }
   };
 
+  const handleClickInsideSideBar = (e: any) => {
+    if (isMenuOpen) {
+      setMenuOpen(false);
+    }
+  };
+
   useEffect(() => {
     document.addEventListener("click", handleClickOutsideSideBar);
+    document.addEventListener("click", handleClickInsideSideBar);
 
     return () => {
       document.removeEventListener("click", handleClickOutsideSideBar);
+      document.removeEventListener("click", handleClickInsideSideBar);
     };
   });
 
