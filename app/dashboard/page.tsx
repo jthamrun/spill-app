@@ -5,14 +5,14 @@ import QuickStatsDashboard from "../../components/Dashboard/QuickStatsDashboard"
 import RecentExpensesDashboard from "../../components/Dashboard/RecentExpensesDashboard";
 
 function Dashboard() {
-  return (
-    <div className="h-[90vh] xl:h-[93vh] px-10 py-5 grid grid-rows-9 md:grid-cols-3 md:grid-rows-5 gap-4 overflow-auto xl:max-w-5xl m-auto">
-      <QuickActionsDashboard />
-      <FriendsStatsDashboard />
-      <QuickStatsDashboard />
-      <RecentExpensesDashboard />
-    </div>
-  );
+    return (
+        <div className="h-[92vh] px-10 py-5 grid grid-rows-9 md:grid-cols-3 md:grid-rows-5 gap-4 overflow-auto xl:max-w-5xl m-auto">
+            <QuickActionsDashboard />
+            <FriendsStatsDashboard />
+            <QuickStatsDashboard />
+            <RecentExpensesDashboard />
+        </div>
+    );
 }
 
 export default Dashboard;
