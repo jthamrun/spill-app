@@ -17,10 +17,10 @@ function SearchFriendsPage() {
         <div className="w-full p-4">
           {/* <SearchPeopleContent placeholder="Search Friends" /> */}
           <div className="mt-4 space-y-3">
-            <SearchPerson name="Jessica Sun" />
+            {/* <SearchPerson name="Jessica Sun" />
             <SearchPerson name="Timothy Thamrun" />
             <SearchPerson name="Tiffany Thamrun" />
-            <SearchPerson name="Calvin Ng" />
+            <SearchPerson name="Calvin Ng" /> */}
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
-import { collection, getDocs, query, where } from "@firebase/firestore";
+import { collection, getDocs, limit, query, where } from "@firebase/firestore";
 import { db } from "../firebase.config";
 import SearchPerson from "./SearchPeople/SearchPerson";
 
@@ -19,12 +19,26 @@ function SearchPeopleContent({ placeholder }: Props) {
   const [search, setSearch] = useState("");
   const [people, setPeople] = useState<User[]>([]);
 
-  console.log(search);
+  // console.log(search);
 
   useEffect(() => {
     const getAllUsers = async () => {
+      const searchArr = search.split(" ");
+
+      for (var i = 0; i < searchArr.length; i++) {
+        searchArr[i] =
+          searchArr[i].charAt(0).toUpperCase() + searchArr[i].slice(1);
+      }
+
+      const searchMod = searchArr.join(" ");
+
       const querySnapshot = await getDocs(
-        query(collection(db, "users"), where("name", "==", search))
+        query(
+          collection(db, "users"),
+          where("name", ">=", searchMod),
+          where("name", "<=", searchMod + "\uf8ff"),
+          limit(10)
+        )
       );
       const users: Array<User> = [];
       querySnapshot.forEach((doc) => {
@@ -39,19 +53,6 @@ function SearchPeopleContent({ placeholder }: Props) {
 
     getAllUsers();
   }, [search]);
-
-  // useEffect(() => {
-  //     const unsub = onSnapshot(collection(db, "users"), (querySnapshot) => {
-  //         const documents = querySnapshot.docs.map((doc) => {
-  //             return {
-  //                 ...doc.data(),
-  //                 id: doc.id,
-  //             };
-  //         });
-  //         setPeople(documents);
-  //     });
-  //     return () => unsub();
-  // }, []);
 
   return (
     <div>
@@ -69,14 +70,13 @@ function SearchPeopleContent({ placeholder }: Props) {
       </div>
       <div className="mt-4 space-y-3">
         {people.map((person, index) => (
-          <SearchPerson key={person.id} name={person.name} />
+          <SearchPerson
+            key={person.id}
+            name={person.name}
+            email={person.email}
+          />
         ))}
       </div>
-
-      {/* <SearchPerson name="Jessica Sun" />
-        <SearchPerson name="Timothy Thamrun" />
-        <SearchPerson name="Tiffany Thamrun" />
-        <SearchPerson name="Calvin Ng" /> */}
     </div>
   );
 }
