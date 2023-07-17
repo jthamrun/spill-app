@@ -1,12 +1,12 @@
 // import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { unstable_getServerSession } from "next-auth";
+import { getServerSession } from "next-auth";
 import React from "react";
 import Link from "next/link";
 import NavigationAvatar from "./NavigationAvatar";
 import NavigationOptions from "./NavigationOptions";
 
 async function MainNavigation() {
-    const session = await unstable_getServerSession();
+    const session = await getServerSession();
 
     return (
         <div className="py-4 px-10 bg-base-green flex items-center justify-between h-[8vh]">

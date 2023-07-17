@@ -34,3 +34,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# application default credentials
+application_default_credentials.json
+
+# service account key
+spill-app-service-account-key.json

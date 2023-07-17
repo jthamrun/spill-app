@@ -1,11 +1,11 @@
 "use client";
-import { unstable_getServerSession } from "next-auth";
+import { getServerSession } from "next-auth";
 import { signIn } from "next-auth/react";
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 type Props = {
-  session: Awaited<ReturnType<typeof unstable_getServerSession>>;
+  session: Awaited<ReturnType<typeof getServerSession>>;
 };
 
 function HomeSignInButton({ session }: Props) {

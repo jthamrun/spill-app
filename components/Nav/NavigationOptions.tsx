@@ -1,11 +1,11 @@
 "use client";
-import { unstable_getServerSession } from "next-auth";
+import { getServerSession } from "next-auth";
 import React, { useState, useRef, useEffect } from "react";
 import { signIn, signOut } from "next-auth/react";
 import Link from "next/link";
 
 type Props = {
-    session: Awaited<ReturnType<typeof unstable_getServerSession>>;
+    session: Awaited<ReturnType<typeof getServerSession>>;
 };
 
 function NavigationOptions({ session }: Props) {

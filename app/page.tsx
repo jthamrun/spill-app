@@ -1,10 +1,11 @@
 import React from "react";
 import { signIn } from "next-auth/react";
 import HomeSignInButton from "../components/Nav/HomeSignInButton";
-import { unstable_getServerSession } from "next-auth";
+import { getServerSession } from "next-auth";
 
 async function Home() {
-  const session = await unstable_getServerSession();
+  const session = await getServerSession();
+  console.log(session?.user)
 
   return (
     <div className="flex items-center justify-center h-96">

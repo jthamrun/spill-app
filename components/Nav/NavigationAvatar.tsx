@@ -1,11 +1,11 @@
 "use client";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { unstable_getServerSession } from "next-auth";
+import { getServerSession } from "next-auth";
 import React from "react";
 import { signIn, signOut } from "next-auth/react";
 
 type Props = {
-  session: Awaited<ReturnType<typeof unstable_getServerSession>>;
+  session: Awaited<ReturnType<typeof getServerSession>>;
 };
 
 function NavigationAvatar({ session }: Props) {
