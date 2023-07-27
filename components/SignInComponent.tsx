@@ -1,20 +1,45 @@
 "use client";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { getProviders, signIn } from "next-auth/react";
-import { useRef, useState } from "react";
+import Link from "next/link";
+import { useContext, useState } from "react";
+import { auth } from "../firebase.config";
+import UserContext from "./store/user-context/user-context";
+import { useRouter } from "next/navigation";
 
 type Props = {
   providers: Awaited<ReturnType<typeof getProviders>>;
 };
 
 function SignInComponent({ providers }: Props) {
+  const router = useRouter()
+
+  // const userCtx = useContext(UserContext)
   const [isPasswordHidden, setIsPasswordHidden] = useState(true);
-  const emailRef = useRef<HTMLInputElement | null>(null)
-  const passwordRef = useRef<HTMLInputElement | null>(null)
+  const [isEmailValid, setIsEmailValid] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const validateEmail = (email: string) => {
+    /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(email)
+      ? setIsEmailValid(true)
+      : setIsEmailValid(false);
+    setEmail(email);
+  };
 
   const uploadToFirestore = () => {
     // upload the email and password to firestore if use default authentication
-    console.log(emailRef.current!.value, passwordRef.current!.value)
-  }
+    console.log(email, password);
+    signInWithEmailAndPassword(auth, email, password).then(
+      (userCredentials) => {
+        router.push('/dashboard')
+      }
+    ).catch(err => {
+      // error handling if signing in user produces error (invalid email or password)
+      console.log(err);
+      
+    });
+  };
 
   return (
     <div className="grid divide-y divide-black place-items-center">
@@ -34,15 +59,40 @@ function SignInComponent({ providers }: Props) {
           </button>
         </div>
       ))}
-      <div key="default" className="grid p-3">
-        <input type="email" placeholder="Email" ref={emailRef} className="font-quicksand font-medium border-2 border-black rounded-md my-2 py-2 pl-4 pr-8 hover:-translate-y-0.5 duration-150 ease-out"/>
-      { !isPasswordHidden &&
-        <input type="password" placeholder="Password" ref={passwordRef} className="font-quicksand font-medium border-2 border-black rounded-md my-2 py-2 pl-4 pr-8 hover:-translate-y-0.5 duration-150 ease-out"/>
-        }
-      <button onClick={() => {
-        isPasswordHidden ? setIsPasswordHidden(false) : uploadToFirestore()
-        }} className="font-quicksand font-bold border-2 border-blue-200 rounded-md bg-blue-600 text-white py-2 my-2">{isPasswordHidden ? "Continue" : "Sign In"}</button>
-      </div>
+      {/* <div key="default" className="grid p-3">
+        <input
+          onChange={(e) => {
+            validateEmail(e.target.value);
+          }}
+          type="email"
+          placeholder="Email"
+          className="font-quicksand font-medium border-2 border-black rounded-md my-2 py-2 pl-4 pr-8 hover:-translate-y-0.5 duration-150 ease-out"
+        />
+        {!isPasswordHidden && (
+          <input
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
+            type="password"
+            placeholder="Password"
+            className="font-quicksand font-medium border-2 border-black rounded-md my-2 py-2 pl-4 pr-8 hover:-translate-y-0.5 duration-150 ease-out"
+          />
+        )}
+        <button
+          onClick={() => {
+            isPasswordHidden ? setIsPasswordHidden(false) : uploadToFirestore();
+          }}
+          disabled={!isEmailValid}
+          className="disabled:bg-gray-500 disabled:border-gray-200 font-quicksand font-bold border-2 border-green-200 rounded-md bg-base-green text-white py-2 my-2"
+        >
+          {isPasswordHidden ? "Continue" : "Sign In"}
+        </button>
+        <Link href="/auth/signup">
+          <p className="font-quicksand font-semibold">
+            Don't have an account? Sign up now
+          </p>
+        </Link>
+      </div> */}
     </div>
   );
 }

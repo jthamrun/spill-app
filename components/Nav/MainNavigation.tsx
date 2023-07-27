@@ -4,9 +4,10 @@ import React from "react";
 import Link from "next/link";
 import NavigationAvatar from "./NavigationAvatar";
 import NavigationOptions from "./NavigationOptions";
+import { authOptions } from "../../pages/api/auth/[...nextauth]";
 
 async function MainNavigation() {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
 
     return (
         <div className="py-4 px-10 bg-base-green flex items-center justify-between h-[8vh]">

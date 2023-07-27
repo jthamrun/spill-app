@@ -4,15 +4,10 @@ import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import { collection, getDocs, limit, query, where } from "@firebase/firestore";
 import { db } from "../firebase.config";
 import SearchPerson from "./SearchPeople/SearchPerson";
+import { User } from "./store/types";
 
 type Props = {
   placeholder: string;
-};
-
-type User = {
-  id?: string;
-  email: string;
-  name: string;
 };
 
 function SearchPeopleContent({ placeholder }: Props) {
@@ -71,7 +66,8 @@ function SearchPeopleContent({ placeholder }: Props) {
       <div className="mt-4 space-y-3">
         {people.map((person, index) => (
           <SearchPerson
-            key={person.id}
+            href={`/search/friends/${person.id}`}
+            key={index}
             name={person.name}
             email={person.email}
           />
