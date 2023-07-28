@@ -66,7 +66,7 @@ function SearchPeopleContent({ placeholder }: Props) {
       <div className="mt-4 space-y-3">
         {people.map((person, index) => (
           <SearchPerson
-            href={`/search/friends/${person.id}`}
+            href={'/search/people/' + person.id}
             key={index}
             name={person.name}
             email={person.email}

@@ -66,12 +66,13 @@ export default NextAuth({
   callbacks: {
     async jwt({ token }) {
       // set a new friend document for the current user
-      console.log(`Token:${{...token}}`);
+      console.log("Token:", token);
       // not working
       await getDocs(
         query(collection(db, "friends"), where("__name__", "==", token.sub))
       ).then(async (data) => {
-        !data.empty &&
+        
+        data.empty &&
           (await setDoc(doc(db, `friends/${token.sub}`), {
             users: [],
           }));
