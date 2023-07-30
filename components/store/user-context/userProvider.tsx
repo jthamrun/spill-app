@@ -1,5 +1,5 @@
 import { useReducer } from "react";
-import { Action } from "../context-types";
+import { Action } from "../types";
 import UserContext from "./user-context";
 import React from "react";
 

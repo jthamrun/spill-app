@@ -8,12 +8,16 @@
   "dependencies": {
     "@heroicons/react": "^2.0.13",
     "@next-auth/firebase-adapter": "1.0.1",
+    "@types/chroma-js": "^2.4.0",
+    "chroma-js": "^2.4.2",
     "csstype": "^3.1.1",
     "firebase": "^9.14.0",
     "next": "latest",
     "next-auth": "^4.17.0",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-currency-input-field": "^3.6.11",
+    "react-dom": "18.2.0",
+    "react-select": "^5.7.4"
   },
   "devDependencies": {
     "@types/node": "18.11.3",

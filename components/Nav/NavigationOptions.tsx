@@ -12,7 +12,7 @@ type Props = {
 };
 
 function NavigationOptions({ session }: Props) {
-    const router = useRouter()
+  const router = useRouter();
   const [isMenuOpen, setMenuOpen] = useState<boolean>(false);
   const sideBarRef = useRef<HTMLElement>(null);
   const genericHamburgerLine = `h-1 w-6 my-0.5 rounded-full bg-black transition ease transform duration-300 z-30`;
@@ -45,12 +45,17 @@ function NavigationOptions({ session }: Props) {
     return (
       <div className="">
         <div className="hidden text-xs min-[785px]:text-sm md:flex md:space-x-10 font-quicksand font-bold">
-          <h1 className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer">
-            Create Expense
-          </h1>
-          <h1 className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer">
-            Past Expenses
-          </h1>
+          <Link href="/expense/add">
+            <h1 className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer">
+              Create Expense
+            </h1>
+          </Link>
+          <Link href="/expense/history">
+            <h1 className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer">
+              Past Expenses
+            </h1>
+          </Link>
+
           <Link href="/search/friends">
             <h1 className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer">
               Friends
@@ -95,16 +100,22 @@ function NavigationOptions({ session }: Props) {
           ref={sideBarRef}
         >
           <div className="flex flex-col space-y-5 items-start ml-12 font-bold font-quicksand">
-            <button>
-              <p className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer text-sm">
-                Create Expense
-              </p>
-            </button>
-            <button>
-              <p className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer text-sm">
-                Past Expense
-              </p>
-            </button>
+            <Link href="/expense/add">
+              <button>
+                <p className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer text-sm">
+                  Create Expense
+                </p>
+              </button>
+            </Link>
+
+            <Link href="/expense/history">
+              <button>
+                <p className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer text-sm">
+                  Past Expense
+                </p>
+              </button>
+            </Link>
+
             <Link href="/search/friends">
               <button>
                 <p className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer text-sm">
@@ -123,12 +134,12 @@ function NavigationOptions({ session }: Props) {
           <button
             className="ml-12 mt-5"
             onClick={() => {
-              !(typeof (session as any).uid === 'string') ?  signOut({ callbackUrl: "/" }) : signOutFirebase(auth).then(() => {
-                // Sign out successful
-                router.push('/')
-                
-              })  
-              
+              !(typeof (session as any).uid === "string")
+                ? signOut({ callbackUrl: "/" })
+                : signOutFirebase(auth).then(() => {
+                    // Sign out successful
+                    router.push("/");
+                  });
             }}
           >
             <p className="transition duration-150 hover:underline hover:underline-offset-4 cursor-pointer text-sm font-bold font-quicksand">
