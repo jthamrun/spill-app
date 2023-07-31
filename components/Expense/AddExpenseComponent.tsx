@@ -136,16 +136,18 @@ const AddExpenseComponent = ({ session }: AnySessionProps) => {
       creator_id: session.user.id,
       users: [],
       subtotal_amount: subtotal,
-      total_amount: ((subtotal * tax )+ subtotal) + tips,
+      total_amount: subtotal * tax + subtotal + tips,
       tax_amount: tax,
       tip_amount: tips,
       status: "ongoing",
-      items: []
-    } as Expense).then(() => {
-        router.replace('/expense/history')
-    }).catch(() => {
+      items: [],
+    } as Expense)
+      .then(() => {
+        router.replace("/expense/history");
+      })
+      .catch(() => {
         setDidErrorOccur(true);
-    }) ;
+      });
   };
   return (
     <div>
@@ -177,122 +179,133 @@ const AddExpenseComponent = ({ session }: AnySessionProps) => {
           </svg>
         </span>
       </div>
-      <div
-        key="default"
-        className="grid p-3 mt-6 border-4 rounded-md border-black"
-      >
-        <h1 className="font-quicksand font-semibold text-4xl text-center mt-5 p-5">
-          Create Expense
+      <div key="default" className="py-16">
+        <h1 className="font-quicksand font-bold text-2xl text-center mb-4">
+          Create a New Expense
         </h1>
-        <div>
-          <label className="block font-quicksand font-medium" htmlFor="name">
-            Name
-          </label>
-          <input
-            id="name"
-            onChange={(e) => {
-              setName(e.target.value);
-            }}
-            type="text"
-            className="font-quicksand font-medium border-2 border-black rounded-md my-2 py-2 pl-4 pr-8 w-full"
-          />
-        </div>
+        <div className="px-16 py-5 grid m-auto border border-black rounded-md ">
+          <div className="space-y-2">
+            <div>
+              <label className="font-quicksand font-medium" htmlFor="name">
+                Name
+              </label>
+              <input
+                id="name"
+                onChange={(e) => {
+                  setName(e.target.value);
+                }}
+                placeholder="Enter Name"
+                type="text"
+                className="font-quicksand font-medium border border-black rounded-md py-2 pl-4 pr-8 w-full"
+              />
+            </div>
 
-        <div>
-          <label className="block font-quicksand font-medium" htmlFor="date">
-            Date
-          </label>
-          <input
-            id="date"
-            onChange={(e) => {
-              console.log(
-                new Date(`${e.target.value}T00:00`).toLocaleDateString()
-              ); // to save in database, convert to ISO string
-              setDate(new Date(`${e.target.value}T00:00`));
-            }}
-            type="date"
-            className="font-quicksand font-medium border-2 border-black rounded-md my-2 py-2 pl-4 pr-8 w-full"
-          />
-        </div>
+            <div>
+              <label
+                className="block font-quicksand font-medium"
+                htmlFor="date"
+              >
+                Date
+              </label>
+              <input
+                id="date"
+                onChange={(e) => {
+                  console.log(
+                    new Date(`${e.target.value}T00:00`).toLocaleDateString()
+                  ); // to save in database, convert to ISO string
+                  setDate(new Date(`${e.target.value}T00:00`));
+                }}
+                type="date"
+                className="font-quicksand font-medium border border-black rounded-md py-2 pl-4 pr-8 w-full"
+              />
+            </div>
 
-        <div>
-          <label
-            className="block font-quicksand font-medium"
-            htmlFor="subtotal"
+            <div>
+              <label
+                className="block font-quicksand font-medium"
+                htmlFor="subtotal"
+              >
+                Subtotal
+              </label>
+              <CurrencyInput
+                id="subtotal"
+                prefix="$"
+                placeholder="Enter Subtotal"
+                decimalsLimit={2}
+                onValueChange={(val, _) => {
+                  val && setSubtotal(parseFloat(val));
+                }}
+                className="font-quicksand font-medium border border-black rounded-md py-2 pl-4 pr-8 w-full"
+              />
+            </div>
+            <div>
+              <label
+                className="block font-quicksand font-medium"
+                htmlFor="tips"
+              >
+                Tip
+              </label>
+              <CurrencyInput
+                id="tips"
+                prefix="$"
+                placeholder="Enter Tip"
+                decimalsLimit={2}
+                onValueChange={(val, _) => {
+                  val && setTips(parseFloat(val));
+                }}
+                className="font-quicksand font-medium border border-black rounded-md py-2 pl-4 pr-8 w-full"
+              />
+            </div>
+            <div>
+              <label className="block font-quicksand font-medium" htmlFor="tax">
+                Tax
+              </label>
+              <CurrencyInput
+                id="tax"
+                suffix="%"
+                placeholder="Enter Tax"
+                decimalsLimit={2}
+                onValueChange={(val, _) => {
+                  val && setTax(parseFloat(val) / 100);
+                }}
+                className="font-quicksand font-medium border border-black rounded-md py-2 pl-4 pr-8 w-full"
+              />
+            </div>
+            <div>
+              <label
+                className="block font-quicksand font-semibold"
+                htmlFor="users"
+              >
+                Who's involved?
+              </label>
+              <AsyncSelect
+                id="users"
+                menuPlacement="auto"
+                menuPosition="fixed"
+                components={animatedComponents}
+                className="font-quicksand font-medium border border-black rounded-md"
+                closeMenuOnSelect={false}
+                isMulti
+                styles={colourStyles}
+                cacheOptions
+                defaultOptions
+                loadOptions={loadOptions}
+                onChange={(e) => {
+                  setUsers(e as Option[]);
+                }}
+                placeholder=""
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={() => {}}
+            disabled
+            className="disabled:bg-gray-500 disabled:border-gray-200 font-quicksand font-bold rounded-md border-2 border-black bg-base-green text-black py-2 mt-8 hover:-translate-y-0.5 duration-150 ease-out"
           >
-            Subtotal
-          </label>
-          <CurrencyInput
-            id="subtotal"
-            prefix="$"
-            placeholder="Subtotal"
-            decimalsLimit={2}
-            onValueChange={(val, _) => {
-              val && setSubtotal(parseFloat(val));
-            }}
-            className="font-quicksand font-medium border-2 border-black rounded-md my-2 py-2 pl-4 pr-8 w-full"
-          />
+            Add
+          </button>
         </div>
-        <div>
-          <label className="block font-quicksand font-medium" htmlFor="tips">
-            Tip
-          </label>
-          <CurrencyInput
-            id="tips"
-            prefix="$"
-            placeholder="Tip"
-            decimalsLimit={2}
-            onValueChange={(val, _) => {
-              val && setTips(parseFloat(val));
-            }}
-            className="font-quicksand font-medium border-2 border-black rounded-md my-2 py-2 pl-4 pr-8 w-full"
-          />
-        </div>
-        <div>
-          <label className="block font-quicksand font-medium" htmlFor="tax">
-            Tax
-          </label>
-          <CurrencyInput
-            id="tax"
-            suffix="%"
-            placeholder="Tax"
-            decimalsLimit={2}
-            onValueChange={(val, _) => {
-              val && setTax(parseFloat(val) / 100);
-            }}
-            className="font-quicksand font-medium border-2 border-black rounded-md my-2 py-2 pl-4 pr-8 w-full"
-          />
-        </div>
-        <div>
-          <label className="block font-quicksand font-semibold" htmlFor="users">
-            Who's involved?
-          </label>
-          <AsyncSelect
-            id="users"
-            menuPlacement="auto"
-            menuPosition="fixed"
-            components={animatedComponents}
-            className="font-quicksand font-medium border-2 border-black rounded-md my-2"
-            closeMenuOnSelect={false}
-            isMulti
-            styles={colourStyles}
-            cacheOptions
-            defaultOptions
-            loadOptions={loadOptions}
-            onChange={(e) => {
-              setUsers(e as Option[]);
-            }}
-            placeholder=""
-          />
-        </div>
-
-        <button
-          onClick={() => {}}
-          disabled
-          className="disabled:bg-gray-500 disabled:border-gray-200 font-quicksand font-bold border-2 border-green-200 rounded-md bg-base-green text-white py-2 my-2 hover:-translate-y-0.5 duration-150 ease-out"
-        >
-          Add
-        </button>
       </div>
     </div>
   );
