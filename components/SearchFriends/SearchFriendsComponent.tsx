@@ -10,14 +10,12 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "../../firebase.config";
-import { User } from "../store/types";
+import { AnySessionProps, User } from "../store/types";
 import Link from "next/link";
 
-type Props = {
-  session: any;
-};
 
-const SearchFriendsComponent = ({ session }: Props) => {
+
+const SearchFriendsComponent = ({ session }: AnySessionProps) => {
   const [friends, setFriends] = useState<User[]>([]);
 
   const getAllFriends = async () => {
@@ -91,10 +89,6 @@ const SearchFriendsComponent = ({ session }: Props) => {
               email={friend.email}
             />
           ))}
-          {/* <SearchPerson name="Jessica Sun" />
-    <SearchPerson name="Timothy Thamrun" />
-    <SearchPerson name="Tiffany Thamrun" />
-    <SearchPerson name="Calvin Ng" /> */}
         </div>
       </div>
     </div>

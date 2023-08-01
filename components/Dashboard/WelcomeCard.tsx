@@ -1,11 +1,8 @@
-import { getServerSession } from "next-auth";
-import React, { useContext } from "react";
-import { authOptions } from "../../pages/api/auth/[...nextauth]";
-import FirebaseAuthContext from "../store/auth-context/firebase-auth-context";
+import React from "react";
 
 type Props = {
-  name: string
-}
+  name: string;
+};
 
 const WelcomeCard = (props: Props) => {
   return (
