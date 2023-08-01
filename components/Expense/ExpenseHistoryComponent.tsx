@@ -3,6 +3,7 @@ import { collection, getDocs, or, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../../firebase.config";
 import { AnySessionProps, Expense, ExpenseItem } from "../store/types";
+import ExpenseCard from "./ExpenseCard";
 
 const ExpenseHistoryComponent = ({ session }: AnySessionProps) => {
   const [expenses, setExpenses] = useState<Expense[]>();
@@ -63,7 +64,25 @@ const ExpenseHistoryComponent = ({ session }: AnySessionProps) => {
     getExpenses();
   }, []);
 
-  return <div>Hello!</div>;
+  return (
+    <div className="flex flex-col items-center pt-8 space-y-6">
+      <div className="flex flex-col border border-black rounded-md w-[70vw] items-center">
+        <h1 className="py-4 font-quicksand font-bold">Past Expenses</h1>
+        <div className="h-[1px] bg-black w-full"></div>
+        <h3 className="py-6 font-quicksand font-semibold">
+          <span className="font-bold">3</span> Expenses
+        </h3>
+      </div>
+      <div className="flex flex-col border border-black rounded-md w-[90vw] items-center">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full py-4 px-6">
+          <ExpenseCard />
+          <ExpenseCard />
+          <ExpenseCard />
+          <ExpenseCard />
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default ExpenseHistoryComponent;
