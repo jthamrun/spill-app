@@ -21,10 +21,10 @@ const PersonProfileComponent = ({ id }: Props) => {
     const getProfile = async () => {
       await getDocs(
         query(collection(db, "users"), where("__name__", "==", id))
-      ).then((doc) => {
-        doc.forEach((d) => {
-          const data = d.data();
-          setUser({ id: d.id, name: data.name, email: data.email });
+      ).then((snapshot) => {
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          setUser({ id: doc.id, name: data.name, email: data.email });
         });
       });
     };

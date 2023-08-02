@@ -12,6 +12,8 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "../../../firebase.config";
+import { useContext } from "react";
+import UserContext from "../../../components/store/user-context/user-context";
 
 // For more information on each option (and a full list of options) go to
 // https://next-auth.js.org/configuration/options
@@ -65,18 +67,25 @@ export default NextAuth({
   },
   callbacks: {
     async jwt({ token }) {
-      // set a new friend document for the current user
-      console.log("Token:", token);
-      // not working
+      // set a new friend document for the current user (if not present in DB)
       await getDocs(
         query(collection(db, "friends"), where("__name__", "==", token.sub))
       ).then(async (data) => {
-        
         data.empty &&
           (await setDoc(doc(db, `friends/${token.sub}`), {
             users: [],
           }));
       });
+
+      // save user info in context when user logs in -- DOESNT WORK (useContext gives null)
+      // const saveInfo = () => {
+      //   const userCtx = useContext(UserContext);
+      //   token.sub && userCtx.updateId(token.sub);
+      //   token.email && userCtx.updateEmail(token.email);
+      //   token.name && userCtx.updateName(token.name);
+      // };
+
+      // saveInfo()
 
       return token;
     },
