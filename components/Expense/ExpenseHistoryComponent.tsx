@@ -81,7 +81,7 @@ const ExpenseHistoryComponent = ({ session }: AnySessionProps) => {
       <div className="h-full overflow-auto border border-black rounded-md space-y-4 p-4 md:min-w-[30%]">
         <div className="flex items-center p-2 h-10 w-full rounded-md pace-x-2 border border-black focus-within:ring-1 focus-within:ring-black">
           <input
-            className="font-quicksand text-search-bar-gray focus:outline-none w-full"
+            className="font-quicksand text-black focus:outline-none w-full"
             type="text"
             placeholder="Search Expense"
             value={search}
