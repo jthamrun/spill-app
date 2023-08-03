@@ -68,8 +68,8 @@ const ExpenseHistoryComponent = ({ session }: AnySessionProps) => {
   }, []);
 
   return (
-    <div className="px-10 py-5 flex flex-col overflow-auto m-auto space-y-5 md:space-y-0 md:flex-row md:justify-center h-[92vh]">
-      <div className="mx-10 border border-black rounded-md text-center md:self-start">
+    <div className="px-10 py-5 flex flex-col overflow-auto m-auto space-y-5 md:space-y-0 md:space-x-10 md:flex-row md:justify-center h-[92vh]">
+      <div className="mx-10 md:mx-0 border border-black rounded-md text-center md:self-start">
         <h1 className="py-4 font-quicksand font-bold md:px-20">
           Past Expenses
         </h1>
