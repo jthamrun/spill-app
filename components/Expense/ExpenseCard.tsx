@@ -1,6 +1,6 @@
 import React from "react";
 
-function PersonProfileExpense() {
+function ExpenseCard() {
     return (
         <div className="flex flex-col border border-black rounded-md py-2 px-4 hover:bg-black group duration-150">
             <p className="font-bold font-quicksand group-hover:text-white">
@@ -19,4 +19,4 @@ function PersonProfileExpense() {
     );
 }
 
-export default PersonProfileExpense;
+export default ExpenseCard;

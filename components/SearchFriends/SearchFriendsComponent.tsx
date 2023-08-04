@@ -13,8 +13,6 @@ import { db } from "../../firebase.config";
 import { AnySessionProps, User } from "../store/types";
 import Link from "next/link";
 
-
-
 const SearchFriendsComponent = ({ session }: AnySessionProps) => {
   const [friends, setFriends] = useState<User[]>([]);
 
