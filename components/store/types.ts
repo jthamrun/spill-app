@@ -20,7 +20,8 @@ export type UserExpense = {
 export type ExpenseItem = {
   item_id: string;
   name: string;
-  amount: string;
+  amount: number;
+  quantity: number;
   ordered_by: string[]; // can be ordered by multiple different users (load User info to UI when needed)
 };
 
@@ -42,7 +43,8 @@ export type Expense = {
 // in database, item_id will be the unique key that identifies expense-item document
 export type ExpenseItem = {
   name: string;
-  amount: string;
+  amount: number;
+  quantity: number;
   ordered_by: string[]; // can be ordered by multiple different users
 };
 

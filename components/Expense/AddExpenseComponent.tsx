@@ -6,11 +6,10 @@ import makeAnimated from "react-select/animated";
 import chroma from "chroma-js";
 import CurrencyInput from "react-currency-input-field";
 import {
+  addDoc,
   collection,
-  doc,
   getDocs,
   query,
-  setDoc,
   where,
 } from "firebase/firestore";
 import { db } from "../../firebase.config";
@@ -132,7 +131,7 @@ const AddExpenseComponent = ({ session }: AnySessionProps) => {
 
   const addExpense = async () => {
     // add the current expense into firebase
-    await setDoc(doc(db, "expenses"), {
+    await addDoc(collection(db, "expenses"), {
       creator_id: session.user.id,
       users: [],
       subtotal_amount: subtotal,
@@ -142,8 +141,8 @@ const AddExpenseComponent = ({ session }: AnySessionProps) => {
       status: "ongoing",
       items: [],
     } as Expense)
-      .then(() => {
-        router.replace("/expense/history");
+      .then((doc) => {
+        router.replace(`/expense/edit/${doc.id}`);
       })
       .catch(() => {
         setDidErrorOccur(true);
@@ -299,7 +298,7 @@ const AddExpenseComponent = ({ session }: AnySessionProps) => {
           </div>
 
           <button
-            onClick={() => {}}
+            onClick={addExpense}
             disabled
             className="disabled:bg-gray-500 disabled:border-gray-200 font-quicksand font-bold rounded-md border-2 border-black bg-base-green text-black py-2 mt-8 hover:-translate-y-0.5 duration-150 ease-out"
           >

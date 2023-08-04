@@ -51,6 +51,7 @@ const ExpenseHistoryComponent = ({ session }: AnySessionProps) => {
                   item_id: item,
                   name: item_data.name,
                   amount: item_data.amount,
+                  quantity: item_data.quantity,
                   ordered_by: item_data.ordered_by, // should we only collect list of user_id or the users object list?
                 });
               });

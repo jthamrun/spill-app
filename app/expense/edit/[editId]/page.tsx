@@ -11,7 +11,7 @@ const editExpensePage = () => {
      setEditId(params.editId as string)
   }, [params])
 
-  return <EditExpenseComponent />
+  return <EditExpenseComponent id={editId} />
 }
 
 export default editExpensePage;
