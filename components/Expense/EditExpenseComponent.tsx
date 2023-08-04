@@ -25,8 +25,6 @@ const EditExpenseComponent = ({ id }: Props) => {
       }
 
   }
-
-  
   const updateItemInfo = (item: ExpenseItem) => {
     // when a user edits an expense item info, this is called
 
