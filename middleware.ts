@@ -4,15 +4,9 @@ import { NextRequestWithAuth, withAuth } from "next-auth/middleware";
 import { db } from "./firebase.config";
 import { NextResponse } from "next/server";
 import { useParams, useSearchParams } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "./pages/api/auth/[...nextauth]";
 
 export default withAuth(
   async function middleware(req: NextRequestWithAuth) {
-    const params = useParams()!;
-    const queryParams = useSearchParams()!;
-    const session: any = getServerSession(authOptions);
-
     if (
       req.nextUrl.pathname.includes("/search/people") &&
       req.nextUrl.pathname != "/search/people"
@@ -21,7 +15,7 @@ export default withAuth(
       const snapshot = await getDocs(
         query(
           collection(db, "users"),
-          where("__name__", "==", params.uid as string)
+          where("__name__", "==", req.nextUrl.pathname.split("/").pop())
         )
       );
 
@@ -36,7 +30,7 @@ export default withAuth(
       const snapshot = await getDocs(
         query(
           collection(db, "friends"),
-          where("__name__", "==", params.uid as string)
+          where("__name__", "==", req.nextUrl.pathname.split("/").pop())
         )
       );
 
@@ -47,11 +41,11 @@ export default withAuth(
       // check if user is authorized to access an edit expense card that has the user invited into it
 
       // first check if the link has a valid inviteID
-      if (queryParams.get("inviteId")) {
+      if (req.nextUrl.searchParams.get("inviteId")) {
         const snapshot = await getDocs(
           query(
             collection(db, "expenses"),
-            where("inviteId", "==", queryParams.get("inviteId"))
+            where("inviteId", "==", req.nextUrl.searchParams.get("inviteId"))
           )
         );
 
@@ -66,18 +60,18 @@ export default withAuth(
         const snapshot = await getDocs(
           query(
             collection(db, "expenses"),
-            where("__name__", "==", params.editId as string)
+            where("__name__", "==", req.nextUrl.pathname.split("/").pop())
           )
-        )
-        if(!snapshot.empty) {
+        );
+        if (!snapshot.empty) {
           // if expense exists then check if user is part of this expense
-          const doc = snapshot.docs[0]
-          if(doc.data().users.includes(session.user.id)){
-            return NextResponse.next()
+          const doc = snapshot.docs[0];
+          if (doc.data().users.includes(req.nextauth.token!.sub)) {
+            return NextResponse.next();
           }
         }
       }
-      // if all of them invalid then redirect user to dashboard 
+      // if all of them invalid then redirect user to dashboard
       return NextResponse.redirect(new URL("/", req.url));
     }
   },

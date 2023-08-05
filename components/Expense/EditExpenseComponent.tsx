@@ -41,6 +41,7 @@ const EditExpenseComponent = ({ id }: Props) => {
 
   const updateItemUsers = (item: ExpenseItem) => {
     // when a user is added or removed from an expense item, this is called
+    // this should be used in the ExpenseItemMenuUserGroup
   }
   
   const updateUsers = (user: UserExpense) => {
