@@ -8,7 +8,7 @@ function ExpenseItemMenu() {
   const [quantityField, setQuantityField] = useState("");
 
   return (
-    <div>
+    <div className="space-y-3">
       <div className="flex flex-1 space-x-2">
         <div className="flex grow shrink-0 items-center p-2 h-10 rounded-md pace-x-2 border border-black focus-within:ring-1 focus-within:ring-black">
           <input
