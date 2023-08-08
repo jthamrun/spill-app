@@ -39,40 +39,38 @@ export default withAuth(
         : NextResponse.next();
     } else if (req.nextUrl.pathname.includes("/expense/edit")) {
       // check if user is authorized to access an edit expense card that has the user invited into it
-
       // first check if the link has a valid inviteID
-      if (req.nextUrl.searchParams.get("inviteId")) {
-        const snapshot = await getDocs(
-          query(
-            collection(db, "expenses"),
-            where("inviteId", "==", req.nextUrl.searchParams.get("inviteId"))
-          )
-        );
-
-        // return snapshot.empty
-        //   ? NextResponse.redirect(new URL("/", req.url))
-        //   : NextResponse.next();
-        if (!snapshot.empty) {
-          return NextResponse.next();
-        }
-      } else {
-        // this means that the url is not an invite link, check if the user accessing this is allowed or not
-        const snapshot = await getDocs(
-          query(
-            collection(db, "expenses"),
-            where("__name__", "==", req.nextUrl.pathname.split("/").pop())
-          )
-        );
-        if (!snapshot.empty) {
-          // if expense exists then check if user is part of this expense
-          const doc = snapshot.docs[0];
-          if (doc.data().users.includes(req.nextauth.token!.sub)) {
-            return NextResponse.next();
-          }
-        }
-      }
-      // if all of them invalid then redirect user to dashboard
-      return NextResponse.redirect(new URL("/", req.url));
+      // if (req.nextUrl.searchParams.get("inviteId")) {
+      //   const snapshot = await getDocs(
+      //     query(
+      //       collection(db, "expenses"),
+      //       where("inviteId", "==", req.nextUrl.searchParams.get("inviteId"))
+      //     )
+      //   );
+      //   // return snapshot.empty
+      //   //   ? NextResponse.redirect(new URL("/", req.url))
+      //   //   : NextResponse.next();
+      //   if (!snapshot.empty) {
+      //     return NextResponse.next();
+      //   }
+      // } else {
+      //   // this means that the url is not an invite link, check if the user accessing this is allowed or not
+      //   const snapshot = await getDocs(
+      //     query(
+      //       collection(db, "expenses"),
+      //       where("__name__", "==", req.nextUrl.pathname.split("/").pop())
+      //     )
+      //   );
+      //   if (!snapshot.empty) {
+      //     // if expense exists then check if user is part of this expense
+      //     const doc = snapshot.docs[0];
+      //     if (doc.data().users.includes(req.nextauth.token!.sub)) {
+      //       return NextResponse.next();
+      //     }
+      //   }
+      // }
+      // // if all of them invalid then redirect user to dashboard
+      // return NextResponse.redirect(new URL("/", req.url));
     }
   },
   {
