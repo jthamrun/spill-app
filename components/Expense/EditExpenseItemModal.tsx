@@ -9,7 +9,7 @@ type ModalProps = {
   setOn: Dispatch<SetStateAction<boolean>>;
 };
 // Modal component.
-const EditExpenseInfoModal = ({ isOpen, setOn }: ModalProps) => {
+const EditExpenseItemModal = ({ isOpen, setOn }: ModalProps) => {
   // Manage button enabled/disabled state.
   const [disabled, setDisabled] = useState<boolean>(false);
   const [name, setName] = useState("");
@@ -24,16 +24,16 @@ const EditExpenseInfoModal = ({ isOpen, setOn }: ModalProps) => {
     <ReactPortal wrapperId="react-portal-modal-container">
       <>
         <div className="fixed top-0 left-0 w-screen h-screen z-40 bg-neutral-800 opacity-50" />
-        <div className="fixed rounded-2xl flex flex-col box-border min-w-fit overflow-hidden py-5 px-8 bg-white inset-y-32 inset-x-24 z-50 min-[900px]:max-w-screen-sm m-auto justify-center">
+        <div className="fixed rounded-2xl flex flex-col box-border min-w-fit overflow-hidden px-8 pt-10 bg-white inset-y-32 inset-x-24 z-50 min-[900px]:max-w-screen-sm m-auto">
           <button
-            className="self-end -mt-5 -mr-2"
+            className="self-end -mt-5 mb-5 -mr-2"
             onClick={() => setOn(false)}
             disabled={disabled}
           >
             <XCircleIcon className="h-6 " />
           </button>
           <h1 className="font-quicksand font-bold text-2xl text-center mb-4">
-            Edit Expense Info
+            Edit Expense Item Info
           </h1>
           <div className="space-y-2 self-center">
             <div>
@@ -54,34 +54,14 @@ const EditExpenseInfoModal = ({ isOpen, setOn }: ModalProps) => {
             <div>
               <label
                 className="block font-quicksand font-medium"
-                htmlFor="date"
+                htmlFor="price"
               >
-                Date
-              </label>
-              <input
-                id="date"
-                onChange={(e) => {
-                  console.log(
-                    new Date(`${e.target.value}T00:00`).toLocaleDateString()
-                  ); // to save in database, convert to ISO string
-                  setDate(new Date(`${e.target.value}T00:00`));
-                }}
-                type="date"
-                className="font-quicksand font-medium border border-black rounded-md py-2 pl-4 pr-8 w-full"
-              />
-            </div>
-
-            <div>
-              <label
-                className="block font-quicksand font-medium"
-                htmlFor="subtotal"
-              >
-                Subtotal
+                Price
               </label>
               <CurrencyInput
-                id="subtotal"
+                id="price"
                 prefix="$"
-                placeholder="Enter Subtotal"
+                placeholder="Enter Price"
                 decimalsLimit={2}
                 onValueChange={(val, _) => {
                   val && setSubtotal(parseFloat(val));
@@ -89,36 +69,21 @@ const EditExpenseInfoModal = ({ isOpen, setOn }: ModalProps) => {
                 className="font-quicksand font-medium border border-black rounded-md py-2 pl-4 pr-8 w-full"
               />
             </div>
+
             <div>
               <label
                 className="block font-quicksand font-medium"
-                htmlFor="tips"
+                htmlFor="quantity"
               >
-                Tip
+                Quantity
               </label>
-              <CurrencyInput
-                id="tips"
-                prefix="$"
-                placeholder="Enter Tip"
-                decimalsLimit={2}
-                onValueChange={(val, _) => {
-                  val && setTips(parseFloat(val));
+              <input
+                id="quantity"
+                onChange={(e) => {
+                  setName(e.target.value);
                 }}
-                className="font-quicksand font-medium border border-black rounded-md py-2 pl-4 pr-8 w-full"
-              />
-            </div>
-            <div>
-              <label className="block font-quicksand font-medium" htmlFor="tax">
-                Tax
-              </label>
-              <CurrencyInput
-                id="tax"
-                suffix="%"
-                placeholder="Enter Tax"
-                decimalsLimit={2}
-                onValueChange={(val, _) => {
-                  val && setTax(parseFloat(val) / 100);
-                }}
+                placeholder="Enter Quantity"
+                type="number"
                 className="font-quicksand font-medium border border-black rounded-md py-2 pl-4 pr-8 w-full"
               />
             </div>
@@ -144,4 +109,4 @@ const EditExpenseInfoModal = ({ isOpen, setOn }: ModalProps) => {
     </ReactPortal>
   );
 };
-export default EditExpenseInfoModal;
+export default EditExpenseItemModal;
