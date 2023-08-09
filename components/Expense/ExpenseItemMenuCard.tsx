@@ -4,26 +4,27 @@ import {
 } from "@heroicons/react/20/solid";
 import React, { useEffect, useRef, useState } from "react";
 import ExpenseItemCard from "./ExpenseItemCard";
-import ExpenseItemDropdown from "./ExpenseItemDropdown";
+import EditExpenseItemModal from "./EditExpenseItemModal";
 
 function ExpenseItemMenuCard() {
   const [isDetailedItem, setIsDetailedItem] = useState(false);
   const [isItemDropdown, setIsItemDropdown] = useState(false);
   const itemDetail = useRef<HTMLInputElement>(null);
-  //const itemDropdown = useRef<HTMLInputElement>(null);
+  const [isEditInfo, setIsEditInfo] = useState(false);
 
   useEffect(() => {
     // only add the event listener when the dropdown is opened
-    if (!isDetailedItem) return;
+    if (!isDetailedItem && !isItemDropdown) return;
     function handleClick(event: any) {
       if (itemDetail.current && !itemDetail.current.contains(event.target)) {
         setIsDetailedItem(false);
+        setIsItemDropdown(false);
       }
     }
     window.addEventListener("click", handleClick);
     // clean up
     return () => window.removeEventListener("click", handleClick);
-  }, [isDetailedItem]);
+  }, [isDetailedItem, isItemDropdown]);
 
   return (
     <div ref={itemDetail} className="relative">
@@ -51,9 +52,19 @@ function ExpenseItemMenuCard() {
       )}
 
       {isItemDropdown && (
-        <div className="absolute right-0 mt-0.5 z-10 border border-black bg-base-green rounded-md">
+        <div
+          className={`absolute right-0 mt-0.5 z-10 border border-black bg-base-green rounded-md ${
+            isDetailedItem ? "-mt-32" : ""
+          }`}
+        >
           <div className="flex flex-col p-3 space-y-2">
-            <button className="hover:bg-white rounded-md duration-150 px-2">
+            <button
+              className="hover:bg-white rounded-md duration-150 px-2"
+              onClick={() => {
+                setIsEditInfo(true);
+                setIsItemDropdown(false);
+              }}
+            >
               <p className="font-quicksand font-bold">Edit</p>
             </button>
             <button className="hover:bg-white rounded-md duration-150 px-2">
@@ -62,6 +73,8 @@ function ExpenseItemMenuCard() {
           </div>
         </div>
       )}
+
+      <EditExpenseItemModal isOpen={isEditInfo} setOn={setIsEditInfo} />
     </div>
   );
 }
