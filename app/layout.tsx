@@ -1,4 +1,5 @@
 import MainNavigation from "../components/Nav/MainNavigation";
+import LoadingProvider from "../components/store/loading-context/loadingProvider";
 import "../styles/globals.css";
 
 export default function RootLayout({
@@ -13,7 +14,7 @@ export default function RootLayout({
           {/* @ts-expect-error Server Component */}
           <MainNavigation />
         </header>
-        {children}
+        <LoadingProvider>{children}</LoadingProvider>
       </body>
     </html>
   );

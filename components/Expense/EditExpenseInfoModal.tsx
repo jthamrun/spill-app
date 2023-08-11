@@ -1,15 +1,22 @@
-import { useState, Dispatch, SetStateAction } from "react";
+import { useState, Dispatch, SetStateAction, useContext } from "react";
 import ReactPortal from "../ReactPortal";
 import CurrencyInput from "react-currency-input-field";
 import { XCircleIcon } from "@heroicons/react/24/outline";
+import { Expense } from "../store/types";
+import moment from "moment";
+import LoadingContext from "../store/loading-context/loading-context";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../../firebase.config";
 
 // Define the props of Modal.
 type ModalProps = {
+  expense?: Expense;
   isOpen: boolean;
   setOn: Dispatch<SetStateAction<boolean>>;
 };
 // Modal component.
-const EditExpenseInfoModal = ({ isOpen, setOn }: ModalProps) => {
+const EditExpenseInfoModal = ({ expense, isOpen, setOn }: ModalProps) => {
+  const { showLoader, hideLoader } = useContext(LoadingContext);
   // Manage button enabled/disabled state.
   const [disabled, setDisabled] = useState<boolean>(false);
   const [name, setName] = useState("");
@@ -17,6 +24,26 @@ const EditExpenseInfoModal = ({ isOpen, setOn }: ModalProps) => {
   const [subtotal, setSubtotal] = useState<number>(0);
   const [tax, setTax] = useState<number>(0.1);
   const [tips, setTips] = useState<number>(0);
+
+  const saveExpenseInfo = async () => {
+    showLoader();
+    try {
+      await setDoc(
+        doc(db, "expenses", expense?.creator_id as string),
+        {
+          name,
+          date: date?.toLocaleDateString(),
+          subtotal_amount: subtotal,
+          tip_amount: tips,
+          tax_amount: tax,
+        },
+        { merge: true }
+      );
+    } catch (err) {
+    } finally {
+      hideLoader();
+    }
+  };
 
   // Return null if isOpen props from parent is false.
   if (!isOpen) return null;
@@ -42,6 +69,7 @@ const EditExpenseInfoModal = ({ isOpen, setOn }: ModalProps) => {
               </label>
               <input
                 id="name"
+                value={expense?.name}
                 onChange={(e) => {
                   setName(e.target.value);
                 }}
@@ -60,6 +88,9 @@ const EditExpenseInfoModal = ({ isOpen, setOn }: ModalProps) => {
               </label>
               <input
                 id="date"
+                value={
+                  expense?.date && moment(expense.date).format("MM-DD-YYYY")
+                }
                 onChange={(e) => {
                   console.log(
                     new Date(`${e.target.value}T00:00`).toLocaleDateString()
@@ -80,6 +111,7 @@ const EditExpenseInfoModal = ({ isOpen, setOn }: ModalProps) => {
               </label>
               <CurrencyInput
                 id="subtotal"
+                value={expense?.subtotal_amount}
                 prefix="$"
                 placeholder="Enter Subtotal"
                 decimalsLimit={2}
@@ -98,6 +130,7 @@ const EditExpenseInfoModal = ({ isOpen, setOn }: ModalProps) => {
               </label>
               <CurrencyInput
                 id="tips"
+                value={expense?.tip_amount}
                 prefix="$"
                 placeholder="Enter Tip"
                 decimalsLimit={2}
@@ -113,6 +146,7 @@ const EditExpenseInfoModal = ({ isOpen, setOn }: ModalProps) => {
               </label>
               <CurrencyInput
                 id="tax"
+                value={expense?.tax_amount}
                 suffix="%"
                 placeholder="Enter Tax"
                 decimalsLimit={2}
@@ -126,11 +160,18 @@ const EditExpenseInfoModal = ({ isOpen, setOn }: ModalProps) => {
 
           <div className="flex justify-center space-x-4 mt-8">
             <button
-              className="border border-black rounded-md py-2 px-4 bg-base-green"
+              className="border border-black rounded-md py-2 px-4 bg-yellow-400"
               onClick={() => setOn(false)}
               disabled={disabled}
             >
               <p className="font-quicksand font-bold">Back</p>
+            </button>
+            <button
+              className="border border-black rounded-md py-2 px-4 bg-base-green"
+              onClick={saveExpenseInfo}
+              disabled={disabled}
+            >
+              <p className="font-quicksand font-bold">Save</p>
             </button>
             <button
               className="border border-black rounded-md py-2 px-4 bg-error-red"

@@ -1,20 +1,27 @@
 import { doc, getDoc } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { db } from "../../firebase.config";
 import { Expense, ExpenseItem, UserExpense } from "../store/types";
 import { LinkIcon } from "@heroicons/react/20/solid";
 import { PencilIcon } from "@heroicons/react/24/outline";
 import ExpenseItemMenu from "./ExpenseItemMenu";
 import EditExpenseInfoModal from "./EditExpenseInfoModal";
+import moment from "moment";
+import LoadingContext from "../store/loading-context/loading-context";
+import { CircularProgress } from "@mui/material";
+import { useRouter } from "next/navigation";
 
 type Props = {
   id: string;
 };
 
 const EditExpenseComponent = ({ id }: Props) => {
+  const router = useRouter()
   const [expense, setExpense] = useState<Expense>();
   const [isSaved, setIsSaved] = useState(false);
   const [isEditInfo, setIsEditInfo] = useState(false);
+
+  const { showLoader, hideLoader } = useContext(LoadingContext);
 
   function saveButtonWrapper(fn: (...args: any[]) => any) {
     // do this everytime anything expense-related is edited. enables the save button
@@ -40,15 +47,17 @@ const EditExpenseComponent = ({ id }: Props) => {
 
   const updateItemUsers = (item: ExpenseItem) => {
     // when a user is added or removed from an expense item, this is called
-    // this should be used in the ExpenseItemMenuUserGroup
+    // this should be used in the ExpenseItemCard
   };
 
   const updateUsers = (user: UserExpense) => {
     // when creator adds a user, this is called
   };
   useEffect(() => {
+    showLoader();
     const getExpense = async () => {
-      await getDoc(doc(db, "expenses", id)).then((snapshot) => {
+      try {
+        const snapshot = await getDoc(doc(db, "expenses", id));
         if (snapshot.exists()) {
           const document = snapshot.data()!;
           const usersList: UserExpense[] = [];
@@ -82,6 +91,8 @@ const EditExpenseComponent = ({ id }: Props) => {
           setExpense({
             expense_id: snapshot.id,
             creator_id: document.creator_id,
+            name: document.name,
+            date: document.date,
             users: usersList,
             subtotal_amount: document.subtotal_amount,
             total_amount: document.total_amount,
@@ -93,7 +104,11 @@ const EditExpenseComponent = ({ id }: Props) => {
         } else {
           // route to a 404 no expense found page or display an error in this page immediately
         }
-      });
+      } catch (err) {
+        // router.push('/dashboard')
+      } finally {
+        hideLoader()
+      }
     };
     getExpense();
   }, []); //retrieve data first time loading
@@ -105,14 +120,17 @@ const EditExpenseComponent = ({ id }: Props) => {
       <div className="flex flex-col min-[900px]:mx-0 space-y-4 self-center min-[900px]:self-auto">
         <div className="border border-black rounded-md">
           <div className="flex py-4 space-x-10 justify-center min-[900px]:px-16">
-            <h1 className="font-quicksand font-bold">BCD</h1>
-            <p>08/02/2023</p>
+            <h1 className="font-quicksand font-bold">{expense?.name}</h1>
+            <p>{expense?.date && moment(expense?.date).format("MM/DD/YYYY")}</p>
           </div>
           <div className="h-[1px] bg-black w-full"></div>
           <div className="py-6 flex space-x-10 justify-center min-[900px]:px-16">
-            <p className="font-quicksand font-bold">$123.43</p>
+            <p className="font-quicksand font-bold">{`$${
+              expense?.total_amount ?? 0
+            }`}</p>
             <p className="font-quicksand font-medium">
-              <span className="font-bold">11</span>Friends
+              <span className="font-bold">{expense?.users.length ?? 0}</span>{" "}
+              Friends
             </p>
           </div>
         </div>
@@ -141,7 +159,11 @@ const EditExpenseComponent = ({ id }: Props) => {
         <ExpenseItemMenu />
       </div>
 
-      <EditExpenseInfoModal isOpen={isEditInfo} setOn={setIsEditInfo} />
+      <EditExpenseInfoModal
+        expense={expense}
+        isOpen={isEditInfo}
+        setOn={setIsEditInfo}
+      />
     </div>
   );
 };
