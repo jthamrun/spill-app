@@ -134,6 +134,8 @@ const AddExpenseComponent = ({ session }: AnySessionProps) => {
     await addDoc(collection(db, "expenses"), {
       creator_id: session.user.id,
       users: [],
+      name,
+      date: date?.toLocaleDateString() ?? null,
       subtotal_amount: subtotal,
       total_amount: subtotal * tax + subtotal + tips,
       tax_amount: tax,

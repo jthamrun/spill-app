@@ -1,22 +1,49 @@
-import { useState, Dispatch, SetStateAction } from "react";
+import { useState, Dispatch, SetStateAction, useContext } from "react";
 import ReactPortal from "../ReactPortal";
 import CurrencyInput from "react-currency-input-field";
 import { XCircleIcon } from "@heroicons/react/24/outline";
+import { ExpenseItem } from "../store/types";
+import { useParams } from "next/navigation";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../../firebase.config";
+import LoadingContext from "../store/loading-context/loading-context";
 
 // Define the props of Modal.
 type ModalProps = {
+  item?: ExpenseItem;
   isOpen: boolean;
   setOn: Dispatch<SetStateAction<boolean>>;
 };
 // Modal component.
-const EditExpenseItemModal = ({ isOpen, setOn }: ModalProps) => {
+const EditExpenseItemModal = ({ item, isOpen, setOn }: ModalProps) => {
+  const params = useParams();
   // Manage button enabled/disabled state.
   const [disabled, setDisabled] = useState<boolean>(false);
-  const [name, setName] = useState("");
-  const [date, setDate] = useState<Date>();
-  const [subtotal, setSubtotal] = useState<number>(0);
-  const [tax, setTax] = useState<number>(0.1);
-  const [tips, setTips] = useState<number>(0);
+  const [name, setName] = useState<string>(item?.name ?? "");
+  const [quantity, setQuantity] = useState<number>(item?.quantity ?? 0);
+  const [amount, setAmount] = useState<number>(item?.amount ?? 0);
+
+  const { showLoader, hideLoader } = useContext(LoadingContext);
+
+  const saveExpenseItemInfo = async () => {
+    // loading component is not at the very top for this one, might be because of ReactPortal
+    showLoader();
+    // update item info on database
+    try {
+      await setDoc(
+        doc(db, "expense-items", item?.item_id as string),
+        {
+          name,
+          amount,
+          quantity,
+        },
+        { merge: true }
+      );
+    } catch (err) {
+    } finally {
+      hideLoader();
+    }
+  };
 
   // Return null if isOpen props from parent is false.
   if (!isOpen) return null;
@@ -42,6 +69,7 @@ const EditExpenseItemModal = ({ isOpen, setOn }: ModalProps) => {
               </label>
               <input
                 id="name"
+                value={name}
                 onChange={(e) => {
                   setName(e.target.value);
                 }}
@@ -60,11 +88,12 @@ const EditExpenseItemModal = ({ isOpen, setOn }: ModalProps) => {
               </label>
               <CurrencyInput
                 id="price"
+                value={amount}
                 prefix="$"
                 placeholder="Enter Price"
                 decimalsLimit={2}
                 onValueChange={(val, _) => {
-                  val && setSubtotal(parseFloat(val));
+                  val && setAmount(parseFloat(val));
                 }}
                 className="font-quicksand font-medium border border-black rounded-md py-2 pl-4 pr-8 w-full"
               />
@@ -79,8 +108,9 @@ const EditExpenseItemModal = ({ isOpen, setOn }: ModalProps) => {
               </label>
               <input
                 id="quantity"
+                value={quantity}
                 onChange={(e) => {
-                  setName(e.target.value);
+                  setQuantity(parseInt(e.target.value));
                 }}
                 placeholder="Enter Quantity"
                 type="number"
@@ -91,11 +121,18 @@ const EditExpenseItemModal = ({ isOpen, setOn }: ModalProps) => {
 
           <div className="flex justify-center space-x-4 mt-8">
             <button
-              className="border border-black rounded-md py-2 px-4 bg-base-green"
+              className="border border-black rounded-md py-2 px-4 bg-yellow-400"
               onClick={() => setOn(false)}
               disabled={disabled}
             >
               <p className="font-quicksand font-bold">Back</p>
+            </button>
+            <button
+              className="border border-black rounded-md py-2 px-4 bg-base-green"
+              onClick={saveExpenseItemInfo}
+              disabled={disabled}
+            >
+              <p className="font-quicksand font-bold">Save</p>
             </button>
             <button
               className="border border-black rounded-md py-2 px-4 bg-error-red"

@@ -29,6 +29,8 @@ export type ExpenseItem = {
 export type Expense = {
   expense_id?: string;
   creator_id: string;
+  name: string;
+  date: string;
   users: UserExpense[];
   subtotal_amount: number;
   total_amount?: number;

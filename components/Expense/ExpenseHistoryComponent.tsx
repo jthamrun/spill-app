@@ -28,6 +28,8 @@ const ExpenseHistoryComponent = ({ session }: AnySessionProps) => {
           const exp: Expense = {
             expense_id: doc.id,
             creator_id: data.creator_id,
+            name: data.name,
+            date: data.date,
             users: data.users,
             subtotal_amount: data.subtotal_amount,
             total_amount: data.total_amount,
