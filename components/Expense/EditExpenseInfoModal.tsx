@@ -1,4 +1,4 @@
-import { useState, Dispatch, SetStateAction, useContext } from "react";
+import { useState, Dispatch, SetStateAction, useContext, useEffect } from "react";
 import ReactPortal from "../ReactPortal";
 import CurrencyInput from "react-currency-input-field";
 import { XCircleIcon } from "@heroicons/react/24/outline";
@@ -16,7 +16,7 @@ type ModalProps = {
 };
 // Modal component.
 const EditExpenseInfoModal = ({ expense, isOpen, setOn }: ModalProps) => {
-  const { showLoader, hideLoader } = useContext(LoadingContext);
+  const { isLoading, showLoader, hideLoader } = useContext(LoadingContext);
   // Manage button enabled/disabled state.
   const [disabled, setDisabled] = useState<boolean>(false);
   const [name, setName] = useState("");
@@ -41,7 +41,10 @@ const EditExpenseInfoModal = ({ expense, isOpen, setOn }: ModalProps) => {
       );
     } catch (err) {
     } finally {
-      hideLoader();
+      setTimeout(() => {
+        hideLoader()
+      }, 1000)
+      
     }
   };
 

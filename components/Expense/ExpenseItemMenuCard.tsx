@@ -5,8 +5,13 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import ExpenseItemCard from "./ExpenseItemCard";
 import EditExpenseItemModal from "./EditExpenseItemModal";
+import { ExpenseItem } from "../store/types";
 
-function ExpenseItemMenuCard() {
+type Props = {
+  item?: ExpenseItem;
+};
+
+function ExpenseItemMenuCard({ item }: Props) {
   const [isDetailedItem, setIsDetailedItem] = useState(false);
   const [isItemDropdown, setIsItemDropdown] = useState(false);
   const itemDetail = useRef<HTMLInputElement>(null);
@@ -33,9 +38,9 @@ function ExpenseItemMenuCard() {
           isDetailedItem ? "bg-base-green" : "bg-white"
         }`}
       >
-        <p className="font-quicksand font-bold">Dumpling Tofu Soup</p>
+        <p className="font-quicksand font-bold">{item?.name ?? "Dumpling Tofu Soup"}</p>
         <div className="flex items-center space-x-8">
-          <p className="font-quicksand font-bold">$11.99</p>
+          <p className="font-quicksand font-bold">${item?.amount ?? "11.99"}</p>
           <button onClick={() => setIsDetailedItem(!isDetailedItem)}>
             <BarsArrowDownIcon className="h-5" />
           </button>
@@ -74,7 +79,7 @@ function ExpenseItemMenuCard() {
         </div>
       )}
 
-      <EditExpenseItemModal isOpen={isEditInfo} setOn={setIsEditInfo} />
+      <EditExpenseItemModal item={item} isOpen={isEditInfo} setOn={setIsEditInfo} />
     </div>
   );
 }

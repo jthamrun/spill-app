@@ -41,7 +41,9 @@ const EditExpenseItemModal = ({ item, isOpen, setOn }: ModalProps) => {
       );
     } catch (err) {
     } finally {
-      hideLoader();
+      setTimeout(() => {
+        hideLoader()
+      }, 1000)
     }
   };
 

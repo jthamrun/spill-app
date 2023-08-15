@@ -50,15 +50,14 @@ const SearchFriendsComponent = ({ session }: AnySessionProps) => {
     setFriends(friendsArr);
   };
 
-  //listen if any friends are added to the current user
-  const unsub = onSnapshot(doc(db, "friends", session.user.id), () => {
-    getAllFriends();
-  });
-
   useEffect(() => {
     // when this page initially load
     // fetch users that are friends with this user, using user id
     getAllFriends();
+
+    const unsub = onSnapshot(doc(db, "friends", session.user.id), () => {
+      getAllFriends();
+    });
     return () => {
       unsub();
     };
