@@ -38,7 +38,9 @@ function ExpenseItemMenuCard({ item }: Props) {
           isDetailedItem ? "bg-base-green" : "bg-white"
         }`}
       >
-        <p className="font-quicksand font-bold">{item?.name ?? "Dumpling Tofu Soup"}</p>
+        <p className="font-quicksand font-bold">
+          {item?.name ?? "Dumpling Tofu Soup"}
+        </p>
         <div className="flex items-center space-x-8">
           <p className="font-quicksand font-bold">${item?.amount ?? "11.99"}</p>
           <button onClick={() => setIsDetailedItem(!isDetailedItem)}>
@@ -59,7 +61,7 @@ function ExpenseItemMenuCard({ item }: Props) {
       {isItemDropdown && (
         <div
           className={`absolute right-0 mt-0.5 z-10 border border-black bg-base-green rounded-md ${
-            isDetailedItem ? "-mt-32" : ""
+            isDetailedItem ? "-mt-[128px]" : ""
           }`}
         >
           <div className="flex flex-col p-3 space-y-2">
@@ -79,7 +81,11 @@ function ExpenseItemMenuCard({ item }: Props) {
         </div>
       )}
 
-      <EditExpenseItemModal item={item} isOpen={isEditInfo} setOn={setIsEditInfo} />
+      <EditExpenseItemModal
+        item={item}
+        isOpen={isEditInfo}
+        setOn={setIsEditInfo}
+      />
     </div>
   );
 }
