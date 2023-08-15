@@ -4,6 +4,7 @@ import {
   doc,
   getDoc,
   onSnapshot,
+  setDoc,
 } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
 import { db } from "../../firebase.config";
@@ -16,6 +17,8 @@ import moment from "moment";
 import LoadingContext from "../store/loading-context/loading-context";
 import { CircularProgress } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { uuidv4 } from "@firebase/util";
+import { randomUUID } from "crypto";
 
 type Props = {
   id: string;
@@ -24,6 +27,8 @@ type Props = {
 const EditExpenseComponent = ({ id }: Props) => {
   const router = useRouter();
   const [expense, setExpense] = useState<Expense>();
+  const [inviteId, setInviteId] = useState<string>("");
+  const [isInviteCopied, setIsInviteCopied] = useState<boolean>(false);
   const [isSaved, setIsSaved] = useState(false);
   const [isEditInfo, setIsEditInfo] = useState(false);
 
@@ -62,8 +67,6 @@ const EditExpenseComponent = ({ id }: Props) => {
     // when creator adds a user, this is called
   };
 
-
-
   const getExpense = async () => {
     showLoader();
     try {
@@ -87,8 +90,8 @@ const EditExpenseComponent = ({ id }: Props) => {
         //     }
         //   });
         // });
-        setItems(document.items as string[])
-
+        setItems(document.items as string[]);
+        document.inviteId && setInviteId(document.inviteId as string);
         // (document.users as string[]).forEach((user: string) => {
         //   let total_amount = 0;
         //   itemsList.forEach((item) => {
@@ -119,8 +122,8 @@ const EditExpenseComponent = ({ id }: Props) => {
       // router.push('/dashboard')
     } finally {
       setTimeout(() => {
-        hideLoader()
-      }, 1000)
+        hideLoader();
+      }, 1000);
     }
   };
 
@@ -140,7 +143,8 @@ const EditExpenseComponent = ({ id }: Props) => {
       //     total_amount,
       //   });
       // });
-      setItems(document.items as string[])
+      setItems(document.items as string[]);
+      document.inviteId && setInviteId(document.inviteId as string);
       setExpense({
         expense_id: docu.id,
         creator_id: document.creator_id,
@@ -157,8 +161,34 @@ const EditExpenseComponent = ({ id }: Props) => {
     } catch (err) {
     } finally {
       setTimeout(() => {
-        hideLoader()
-      }, 1000)
+        hideLoader();
+      }, 1000);
+    }
+  };
+
+  const sendInviteLink = async () => {
+    try {
+      let invite_id: string = inviteId;
+      if (!invite_id) {
+        invite_id = randomUUID();
+
+        await setDoc(
+          doc(db, "expenses", id),
+          {
+            inviteId: invite_id,
+          },
+          { merge: true }
+        );
+        setInviteId(invite_id);
+      }
+
+      // copy to clipboard
+      await navigator.clipboard.writeText(invite_id);
+
+      setIsInviteCopied(true);
+    } catch (err) {
+      // error with either uploading new invite to DB or copying invite to clipboard
+    } finally {
     }
   };
 
@@ -210,7 +240,7 @@ const EditExpenseComponent = ({ id }: Props) => {
             <PencilIcon className="h-5" />
           </button>
 
-          <button className="h-full bg-base-green border border-black rounded-md py-2 px-3">
+          <button disabled onClick={sendInviteLink} className="h-full bg-base-green border border-black rounded-md py-2 px-3">
             <LinkIcon className="h-5" />
           </button>
         </div>

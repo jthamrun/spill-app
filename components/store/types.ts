@@ -62,5 +62,6 @@ export type Expense = {
   tip_amount?: number;
   status: string;
   items?: string[];
+  inviteId?: string;
 }; 
 */
