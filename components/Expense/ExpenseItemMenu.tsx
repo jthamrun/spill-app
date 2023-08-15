@@ -6,6 +6,7 @@ import {
   DocumentData,
   QuerySnapshot,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   onSnapshot,
@@ -50,6 +51,20 @@ function ExpenseItemMenu({ id, items }: Props) {
     });
 
     setItemsList(itemsList);
+  };
+
+  const deleteExpenseItem = async (item: ExpenseItem) => {
+    // delete expense item from db and local storage
+    showLoader();
+    try {
+      await deleteDoc(doc(db, "expense-items", item.item_id));
+      setItemsList((prev) => prev.filter((i) => i.item_id !== item.item_id));
+    } catch (err) {
+    } finally {
+      setTimeout(() => {
+        hideLoader();
+      }, 1000);
+    }
   };
 
   const updateExpenseItems = (snapshot: QuerySnapshot<DocumentData>) => {
@@ -133,7 +148,11 @@ function ExpenseItemMenu({ id, items }: Props) {
 
       <div className="flex flex-col space-y-2">
         {itemsList.map((item: ExpenseItem) => (
-          <ExpenseItemMenuCard key={item.item_id} item={item} />
+          <ExpenseItemMenuCard
+            key={item.item_id}
+            item={item}
+            onDelete={deleteExpenseItem}
+          />
         ))}
         <ExpenseItemMenuCard />
         <ExpenseItemMenuCard />

@@ -9,9 +9,10 @@ import { ExpenseItem } from "../store/types";
 
 type Props = {
   item?: ExpenseItem;
+  onDelete?: (_: ExpenseItem) => Promise<void>;
 };
 
-function ExpenseItemMenuCard({ item }: Props) {
+function ExpenseItemMenuCard({ item, onDelete }: Props) {
   const [isDetailedItem, setIsDetailedItem] = useState(false);
   const [isItemDropdown, setIsItemDropdown] = useState(false);
   const itemDetail = useRef<HTMLInputElement>(null);
@@ -74,7 +75,7 @@ function ExpenseItemMenuCard({ item }: Props) {
             >
               <p className="font-quicksand font-bold">Edit</p>
             </button>
-            <button className="hover:bg-white rounded-md duration-150 px-2">
+            <button onClick={() => {onDelete!(item!)}} className="hover:bg-white rounded-md duration-150 px-2">
               <p className="font-quicksand font-bold">Delete</p>
             </button>
           </div>
