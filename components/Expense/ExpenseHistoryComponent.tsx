@@ -7,7 +7,7 @@ import ExpenseCard from "./ExpenseCard";
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 
 const ExpenseHistoryComponent = ({ session }: AnySessionProps) => {
-  const [expenses, setExpenses] = useState<Expense[]>();
+  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -30,7 +30,7 @@ const ExpenseHistoryComponent = ({ session }: AnySessionProps) => {
             creator_id: data.creator_id,
             name: data.name,
             date: data.date,
-            users: data.users,
+            users: [],
             subtotal_amount: data.subtotal_amount,
             total_amount: data.total_amount,
             tax_amount: data.tax_amount,
@@ -40,25 +40,26 @@ const ExpenseHistoryComponent = ({ session }: AnySessionProps) => {
           };
 
           // find each of the expense items in database
-          data.items.forEach(async (item: string) => {
-            await getDocs(
-              query(
-                collection(db, "expense-items"),
-                where("__name__", "==", item)
-              )
-            ).then((item_snapshot) => {
-              item_snapshot.forEach((item_doc) => {
-                const item_data = item_doc.data();
-                exp.items?.push({
-                  item_id: item,
-                  name: item_data.name,
-                  amount: item_data.amount,
-                  quantity: item_data.quantity,
-                  ordered_by: item_data.ordered_by, // should we only collect list of user_id or the users object list?
-                });
-              });
-            });
-          });
+          // data.items.forEach(async (item: string) => {
+          //   await getDocs(
+          //     query(
+          //       collection(db, "expense-items"),
+          //       where("__name__", "==", item)
+          //     )
+          //   ).then((item_snapshot) => {
+          //     item_snapshot.forEach((item_doc) => {
+          //       const item_data = item_doc.data();
+          //       exp.items?.push({
+          //         item_id: item,
+          //         expense_id: item_data.expense_id,
+          //         name: item_data.name,
+          //         amount: item_data.amount,
+          //         quantity: item_data.quantity,
+          //         ordered_by: item_data.ordered_by, // should we only collect list of user_id or the users object list?
+          //       });
+          //     });
+          //   });
+          // });
 
           expenseList.push(exp);
         });
@@ -78,7 +79,7 @@ const ExpenseHistoryComponent = ({ session }: AnySessionProps) => {
         </h1>
         <div className="h-[1px] bg-black w-full"></div>
         <h3 className="py-6 font-quicksand font-medium">
-          <span className="font-bold">3</span> Expenses
+          <span className="font-bold">{expenses.length}</span> Expenses
         </h3>
       </div>
       <div className="h-full overflow-auto border border-black rounded-md space-y-4 p-4 md:min-w-[30%]">
@@ -95,6 +96,9 @@ const ExpenseHistoryComponent = ({ session }: AnySessionProps) => {
           <MagnifyingGlassIcon className="h-5" />
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full">
+          {expenses.map((expense) => (
+            <ExpenseCard key={expense.expense_id} expense={expense} />
+          ))}
           <ExpenseCard />
           <ExpenseCard />
           <ExpenseCard />

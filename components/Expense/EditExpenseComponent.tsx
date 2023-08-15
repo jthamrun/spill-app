@@ -1,4 +1,10 @@
-import { doc, getDoc } from "firebase/firestore";
+import {
+  DocumentData,
+  DocumentSnapshot,
+  doc,
+  getDoc,
+  onSnapshot,
+} from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
 import { db } from "../../firebase.config";
 import { Expense, ExpenseItem, UserExpense } from "../store/types";
@@ -16,10 +22,12 @@ type Props = {
 };
 
 const EditExpenseComponent = ({ id }: Props) => {
-  const router = useRouter()
+  const router = useRouter();
   const [expense, setExpense] = useState<Expense>();
   const [isSaved, setIsSaved] = useState(false);
   const [isEditInfo, setIsEditInfo] = useState(false);
+
+  const [items, setItems] = useState<string[]>([]);
 
   const { showLoader, hideLoader } = useContext(LoadingContext);
 
@@ -53,64 +61,117 @@ const EditExpenseComponent = ({ id }: Props) => {
   const updateUsers = (user: UserExpense) => {
     // when creator adds a user, this is called
   };
-  useEffect(() => {
-    showLoader();
-    const getExpense = async () => {
-      try {
-        const snapshot = await getDoc(doc(db, "expenses", id));
-        if (snapshot.exists()) {
-          const document = snapshot.data()!;
-          const usersList: UserExpense[] = [];
-          const itemsList: ExpenseItem[] = [];
-          // set the users and items atrribute respectively
-          (document.items as string[]).forEach(async (item: string) => {
-            await getDoc(doc(db, "expense-items", item)).then((snap) => {
-              if (snap.exists()) {
-                const data = snapshot.data()!;
-                itemsList.push({
-                  item_id: snap.id,
-                  name: data.name,
-                  amount: data.amount,
-                  quantity: data.quantity,
-                  ordered_by: data.ordered_by,
-                });
-              }
-            });
-          });
 
-          (document.users as string[]).forEach((user: string) => {
-            let total_amount = 0;
-            itemsList.forEach((item) => {
-              item.ordered_by.includes(user) && (total_amount += item.amount);
-            });
-            usersList.push({
-              user_id: user,
-              total_amount,
-            });
-          });
-          setExpense({
-            expense_id: snapshot.id,
-            creator_id: document.creator_id,
-            name: document.name,
-            date: document.date,
-            users: usersList,
-            subtotal_amount: document.subtotal_amount,
-            total_amount: document.total_amount,
-            tax_amount: document.tax_amount,
-            tip_amount: document.tip_amount,
-            status: document.status,
-            items: itemsList,
-          });
-        } else {
-          // route to a 404 no expense found page or display an error in this page immediately
-        }
-      } catch (err) {
-        // router.push('/dashboard')
-      } finally {
-        hideLoader()
+
+
+  const getExpense = async () => {
+    showLoader();
+    try {
+      const snapshot = await getDoc(doc(db, "expenses", id));
+      if (snapshot.exists()) {
+        const document = snapshot.data()!;
+        // const usersList: UserExpense[] = [];
+        // const itemsList: ExpenseItem[] = [];
+        // // set the users and items atrribute respectively
+        // (document.items as string[]).forEach(async (item: string) => {
+        //   await getDoc(doc(db, "expense-items", item)).then((snap) => {
+        //     if (snap.exists()) {
+        //       const data = snapshot.data()!;
+        //       itemsList.push({
+        //         item_id: snap.id,
+        //         name: data.name,
+        //         amount: data.amount,
+        //         quantity: data.quantity,
+        //         ordered_by: data.ordered_by,
+        //       });
+        //     }
+        //   });
+        // });
+        setItems(document.items as string[])
+
+        // (document.users as string[]).forEach((user: string) => {
+        //   let total_amount = 0;
+        //   itemsList.forEach((item) => {
+        //     item.ordered_by.includes(user) && (total_amount += item.amount);
+        //   });
+        //   usersList.push({
+        //     user_id: user,
+        //     total_amount,
+        //   });
+        // });
+        setExpense({
+          expense_id: snapshot.id,
+          creator_id: document.creator_id,
+          name: document.name,
+          date: document.date,
+          users: [],
+          subtotal_amount: document.subtotal_amount,
+          total_amount: document.total_amount,
+          tax_amount: document.tax_amount,
+          tip_amount: document.tip_amount,
+          status: document.status,
+          items: [],
+        });
+      } else {
+        // route to a 404 no expense found page or display an error in this page immediately
       }
-    };
+    } catch (err) {
+      // router.push('/dashboard')
+    } finally {
+      setTimeout(() => {
+        hideLoader()
+      }, 1000)
+    }
+  };
+
+  const updateExpense = async (docu: DocumentSnapshot<DocumentData>) => {
+    showLoader();
+    try {
+      const document = docu.data()!;
+      // const usersList: UserExpense[] = [];
+
+      // (document.users as string[]).forEach((user: string) => {
+      //   let total_amount = 0;
+      //   itemsList.forEach((item) => {
+      //     item.ordered_by.includes(user) && (total_amount += item.amount);
+      //   });
+      //   usersList.push({
+      //     user_id: user,
+      //     total_amount,
+      //   });
+      // });
+      setItems(document.items as string[])
+      setExpense({
+        expense_id: docu.id,
+        creator_id: document.creator_id,
+        name: document.name,
+        date: document.date,
+        users: [],
+        subtotal_amount: document.subtotal_amount,
+        total_amount: document.total_amount,
+        tax_amount: document.tax_amount,
+        tip_amount: document.tip_amount,
+        status: document.status,
+        items: [],
+      });
+    } catch (err) {
+    } finally {
+      setTimeout(() => {
+        hideLoader()
+      }, 1000)
+    }
+  };
+
+  useEffect(() => {
     getExpense();
+    // listen to any changes in expenses db (catch errors)
+    const unsub_expense = onSnapshot(doc(db, "expenses", id), (docu) => {
+      updateExpense(docu);
+    });
+
+    return () => {
+      unsub_expense();
+    };
   }, []); //retrieve data first time loading
 
   // you can use "expense" variable to work on the UI.
@@ -156,7 +217,7 @@ const EditExpenseComponent = ({ id }: Props) => {
       </div>
 
       <div className="h-full overflow-auto border border-black rounded-md space-y-4 p-4 m-auto">
-        <ExpenseItemMenu />
+        <ExpenseItemMenu id={id} items={items} />
       </div>
 
       <EditExpenseInfoModal

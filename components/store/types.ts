@@ -19,6 +19,7 @@ export type UserExpense = {
 // in database, item_id will be the unique key that identifies expense-item document
 export type ExpenseItem = {
   item_id: string;
+  expense_id: string;
   name: string;
   amount: number;
   quantity: number;
@@ -27,7 +28,7 @@ export type ExpenseItem = {
 
 // in database, expense_id will be the unique key that identifies expense document
 export type Expense = {
-  expense_id?: string;
+  expense_id: string;
   creator_id: string;
   name: string;
   date: string;
@@ -44,6 +45,7 @@ export type Expense = {
 /*
 // in database, item_id will be the unique key that identifies expense-item document
 export type ExpenseItem = {
+  expense_id: string
   name: string;
   amount: number;
   quantity: number;
