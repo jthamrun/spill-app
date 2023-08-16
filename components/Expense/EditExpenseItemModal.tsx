@@ -54,7 +54,7 @@ const EditExpenseItemModal = ({ item, isOpen, setOn }: ModalProps) => {
     <ReactPortal wrapperId="react-portal-modal-container">
       <>
         <div className="fixed top-0 left-0 w-screen h-screen z-40 bg-neutral-800 opacity-50" />
-        <div className="fixed rounded-2xl flex flex-col box-border min-w-fit overflow-hidden px-8 pt-10 bg-white inset-y-32 inset-x-24 z-40 min-[900px]:max-w-screen-sm m-auto">
+        <div className="fixed rounded-2xl flex flex-col box-border min-w-fit overflow-auto px-8 pt-10 bg-white inset-y-32 inset-x-12 min-[900px]:inset-x-24 z-40 min-[900px]:max-w-screen-sm m-auto">
           <button
             className="self-end -mt-5 mb-5 -mr-2"
             onClick={() => setOn(false)}
