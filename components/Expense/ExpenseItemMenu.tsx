@@ -1,7 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import { PlusCircleIcon } from "@heroicons/react/20/solid";
 import ExpenseItemMenuCard from "./ExpenseItemMenuCard";
-import { ExpenseItem } from "../store/types";
+import {
+  ExpenseItem,
+  ExpenseItemGroup,
+  UserExpenseGroup,
+} from "../store/types";
 import {
   DocumentData,
   QuerySnapshot,
@@ -35,16 +39,16 @@ function ExpenseItemMenu({ id, items }: Props) {
     // set the items atrribute respectively
 
     items.forEach(async (item: string) => {
-      await getDoc(doc(db, "expense-items", item)).then((snap) => {
+      getDoc(doc(db, "expense-items", item)).then((snap) => {
         if (snap.exists()) {
           const data = snap.data()!;
           itemsList.push({
             item_id: snap.id,
             expense_id: data.expense_id,
             name: data.name,
-            amount: data.amount,
-            quantity: data.quantity,
-            ordered_by: data.ordered_by,
+            amount: parseInt(data.amount),
+            quantity: parseInt(data.quantity),
+            groups: data.groups,
           });
         }
       });
@@ -81,7 +85,7 @@ function ExpenseItemMenu({ id, items }: Props) {
           name: item_data.name,
           amount: parseInt(item_data.amount),
           quantity: parseInt(item_data.quantity),
-          ordered_by: item_data.ordered_by,
+          groups: item_data.groups,
         } as ExpenseItem
       );
     });
@@ -94,7 +98,7 @@ function ExpenseItemMenu({ id, items }: Props) {
     getExpenseItems();
     // listen to any expense items changes related to the user (catch errors)
     const unsub_expense_items = onSnapshot(
-      query(collection(db, "expenses"), where("expense_id", "==", id)),
+      query(collection(db, "expense-items"), where("expense_id", "==", id)),
       (snapshot) => {
         updateExpenseItems(snapshot);
       }
