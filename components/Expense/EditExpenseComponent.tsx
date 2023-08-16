@@ -8,16 +8,14 @@ import {
 } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
 import { db } from "../../firebase.config";
-import { Expense, ExpenseItem, UserExpense } from "../store/types";
+import { Expense } from "../store/types";
 import { LinkIcon } from "@heroicons/react/20/solid";
 import { PencilIcon } from "@heroicons/react/24/outline";
 import ExpenseItemMenu from "./ExpenseItemMenu";
 import EditExpenseInfoModal from "./EditExpenseInfoModal";
 import moment from "moment";
 import LoadingContext from "../store/loading-context/loading-context";
-import { CircularProgress } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { uuidv4 } from "@firebase/util";
 import { randomUUID } from "crypto";
 
 type Props = {
@@ -29,43 +27,12 @@ const EditExpenseComponent = ({ id }: Props) => {
   const [expense, setExpense] = useState<Expense>();
   const [inviteId, setInviteId] = useState<string>("");
   const [isInviteCopied, setIsInviteCopied] = useState<boolean>(false);
-  const [isSaved, setIsSaved] = useState(false);
   const [isEditInfo, setIsEditInfo] = useState(false);
 
+  const [users, setUsers] = useState<string[]>([]);
   const [items, setItems] = useState<string[]>([]);
 
   const { showLoader, hideLoader } = useContext(LoadingContext);
-
-  function saveButtonWrapper(fn: (...args: any[]) => any) {
-    // do this everytime anything expense-related is edited. enables the save button
-    return function (...args: any[]) {
-      const result = fn(...args);
-      setIsSaved(true);
-      return result;
-    };
-  }
-  const updateItemInfo = (item: ExpenseItem) => {
-    // when a user edits an expense item info, this is called
-
-    setExpense((exp: any) => {
-      return {
-        ...exp,
-        items: [
-          ...exp.items.filter((e: ExpenseItem) => e.item_id == item.item_id),
-          item,
-        ],
-      };
-    });
-  };
-
-  const updateItemUsers = (item: ExpenseItem) => {
-    // when a user is added or removed from an expense item, this is called
-    // this should be used in the ExpenseItemCard
-  };
-
-  const updateUsers = (user: UserExpense) => {
-    // when creator adds a user, this is called
-  };
 
   const getExpense = async () => {
     showLoader();
@@ -90,6 +57,7 @@ const EditExpenseComponent = ({ id }: Props) => {
         //     }
         //   });
         // });
+        setUsers(document.users as string[]);
         setItems(document.items as string[]);
         document.inviteId && setInviteId(document.inviteId as string);
         // (document.users as string[]).forEach((user: string) => {
@@ -107,13 +75,11 @@ const EditExpenseComponent = ({ id }: Props) => {
           creator_id: document.creator_id,
           name: document.name,
           date: document.date,
-          users: [],
           subtotal_amount: document.subtotal_amount,
           total_amount: document.total_amount,
           tax_amount: document.tax_amount,
           tip_amount: document.tip_amount,
           status: document.status,
-          items: [],
         });
       } else {
         // route to a 404 no expense found page or display an error in this page immediately
@@ -143,6 +109,7 @@ const EditExpenseComponent = ({ id }: Props) => {
       //     total_amount,
       //   });
       // });
+      setUsers(document.users as string[]);
       setItems(document.items as string[]);
       document.inviteId && setInviteId(document.inviteId as string);
       setExpense({
@@ -150,13 +117,11 @@ const EditExpenseComponent = ({ id }: Props) => {
         creator_id: document.creator_id,
         name: document.name,
         date: document.date,
-        users: [],
         subtotal_amount: document.subtotal_amount,
         total_amount: document.total_amount,
         tax_amount: document.tax_amount,
         tip_amount: document.tip_amount,
         status: document.status,
-        items: [],
       });
     } catch (err) {
     } finally {
@@ -220,7 +185,7 @@ const EditExpenseComponent = ({ id }: Props) => {
               expense?.total_amount ?? 0
             }`}</p>
             <p className="font-quicksand font-medium">
-              <span className="font-bold">{expense?.users.length ?? 0}</span>{" "}
+              <span className="font-bold">{users.length}</span>{" "}
               Friends
             </p>
           </div>

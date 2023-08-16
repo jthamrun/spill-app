@@ -30,13 +30,11 @@ const ExpenseHistoryComponent = ({ session }: AnySessionProps) => {
             creator_id: data.creator_id,
             name: data.name,
             date: data.date,
-            users: [],
             subtotal_amount: data.subtotal_amount,
             total_amount: data.total_amount,
             tax_amount: data.tax_amount,
             tip_amount: data.tip_amount,
             status: data.status,
-            items: [],
           };
 
           // find each of the expense items in database
