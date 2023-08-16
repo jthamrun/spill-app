@@ -62,7 +62,7 @@ function ExpenseItemMenuCard({ item, onDelete }: Props) {
       {isItemDropdown && (
         <div
           className={`absolute right-0 mt-0.5 z-10 border border-black bg-base-green rounded-md ${
-            isDetailedItem ? "-mt-[128px]" : ""
+            isDetailedItem ? "-mt-[127px]" : ""
           }`}
         >
           <div className="flex flex-col p-3 space-y-2">
@@ -75,7 +75,12 @@ function ExpenseItemMenuCard({ item, onDelete }: Props) {
             >
               <p className="font-quicksand font-bold">Edit</p>
             </button>
-            <button onClick={() => {onDelete!(item!)}} className="hover:bg-white rounded-md duration-150 px-2">
+            <button
+              onClick={() => {
+                onDelete!(item!);
+              }}
+              className="hover:bg-white rounded-md duration-150 px-2"
+            >
               <p className="font-quicksand font-bold">Delete</p>
             </button>
           </div>
