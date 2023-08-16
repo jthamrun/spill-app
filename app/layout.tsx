@@ -16,9 +16,7 @@ export default function RootLayout({
           {/* @ts-expect-error Server Component */}
           <MainNavigation />
         </header>
-        <LoadingProvider>
-          <Suspense fallback={<LoadingComponent />}>{children}</Suspense>
-        </LoadingProvider>
+        <LoadingProvider>{children}</LoadingProvider>
       </body>
     </html>
   );
