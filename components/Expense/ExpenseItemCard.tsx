@@ -1,12 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { UserPlusIcon, UserMinusIcon } from "@heroicons/react/20/solid";
 import { ExpenseItemGroup } from "../store/types";
+import AddPersonToItemCardModal from "./AddPersonToItemCardModal";
 
 type Props = {
   group?: ExpenseItemGroup;
 };
 
 function ExpenseItemCard({ group }: Props) {
+  const [isAddPersonModal, setIsAddPersonModal] = useState(false);
+
   return (
     <div className="flex items-center justify-between space-x-2">
       <div className="flex flex-1 flex-wrap gap-1 border border-black p-2 rounded-md bg-white items-center">
@@ -25,13 +28,23 @@ function ExpenseItemCard({ group }: Props) {
       </div>
 
       <div className="flex space-x-1">
-        <button className="border border-black p-2  rounded-md bg-light-green">
+        <button
+          className="border border-black p-2  rounded-md bg-light-green"
+          onClick={() => setIsAddPersonModal(true)}
+        >
           <UserPlusIcon className="h-5" />
         </button>
         <button className="border border-black p-2  rounded-md bg-error-red">
           <UserMinusIcon className="h-5" />
         </button>
       </div>
+
+      {isAddPersonModal && (
+        <AddPersonToItemCardModal
+          isOpen={isAddPersonModal}
+          setOn={setIsAddPersonModal}
+        />
+      )}
     </div>
   );
 }
