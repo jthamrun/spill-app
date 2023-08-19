@@ -1,11 +1,11 @@
-"use client"
-import { useParams } from "next/navigation"
+"use client";
+import { useParams } from "next/navigation";
 import EditExpenseComponent from "../../../../components/Expense/EditExpenseComponent";
 
-const editExpensePage = () => {
-    const params = useParams()!;
+const editExpensePage = async () => {
+  const params = useParams()!;
 
-  return <EditExpenseComponent id={params.editId as string} />
-}
+  return <EditExpenseComponent id={params.editId as string} />;
+};
 
 export default editExpensePage;
