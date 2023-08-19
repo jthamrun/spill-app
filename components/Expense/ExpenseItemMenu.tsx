@@ -150,7 +150,7 @@ function ExpenseItemMenu({ id, items }: Props) {
         </button>
       </div>
 
-      <div className="flex flex-col space-y-2">
+      <div className="flex flex-col">
         {itemsList.map((item: ExpenseItem) => (
           <ExpenseItemMenuCard
             key={item.item_id}

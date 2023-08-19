@@ -17,6 +17,8 @@ import moment from "moment";
 import LoadingContext from "../store/loading-context/loading-context";
 import { useRouter } from "next/navigation";
 import { randomUUID } from "crypto";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 type Props = {
   id: string;
@@ -134,18 +136,18 @@ const EditExpenseComponent = ({ id }: Props) => {
   const sendInviteLink = async () => {
     try {
       let invite_id: string = inviteId;
-      if (!invite_id) {
-        invite_id = randomUUID();
+      // if (!invite_id) {
+      //   invite_id = randomUUID();
 
-        await setDoc(
-          doc(db, "expenses", id),
-          {
-            inviteId: invite_id,
-          },
-          { merge: true }
-        );
-        setInviteId(invite_id);
-      }
+      //   await setDoc(
+      //     doc(db, "expenses", id),
+      //     {
+      //       inviteId: invite_id,
+      //     },
+      //     { merge: true }
+      //   );
+      //   setInviteId(invite_id);
+      // }
 
       // copy to clipboard
       await navigator.clipboard.writeText(invite_id);
@@ -153,7 +155,21 @@ const EditExpenseComponent = ({ id }: Props) => {
       setIsInviteCopied(true);
     } catch (err) {
       // error with either uploading new invite to DB or copying invite to clipboard
+      toast.error("Error Copying", {
+        autoClose: 2000, //2 seconds
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+      });
     } finally {
+      if (isInviteCopied) {
+        toast.success("Copied Invite Link", {
+          autoClose: 2000, //2 seconds
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+        });
+      }
     }
   };
 
@@ -174,6 +190,14 @@ const EditExpenseComponent = ({ id }: Props) => {
   return (
     <div className="px-10 py-5 flex flex-col overflow-auto m-auto space-y-5 min-[900px]:space-y-0 min-[900px]:space-x-10 min-[900px]:flex-row min-[900px]:justify-center h-[92vh]">
       <div className="flex flex-col min-[900px]:mx-0 space-y-4 self-center min-[900px]:self-auto">
+        <div className="toast-container">
+          <ToastContainer
+            limit={2}
+            bodyClassName={() =>
+              "flex space-x-2 items-center font-quicksand font-bold pl-2"
+            }
+          />
+        </div>
         <div className="border border-black rounded-md">
           <div className="flex py-4 space-x-10 justify-center min-[900px]:px-16">
             <h1 className="font-quicksand font-bold">{expense?.name}</h1>
@@ -185,8 +209,7 @@ const EditExpenseComponent = ({ id }: Props) => {
               expense?.total_amount ?? 0
             }`}</p>
             <p className="font-quicksand font-medium">
-              <span className="font-bold">{users.length}</span>{" "}
-              Friends
+              <span className="font-bold">{users.length}</span> Friends
             </p>
           </div>
         </div>
@@ -205,7 +228,10 @@ const EditExpenseComponent = ({ id }: Props) => {
             <PencilIcon className="h-5" />
           </button>
 
-          <button disabled onClick={sendInviteLink} className="h-full bg-base-green border border-black rounded-md py-2 px-3">
+          <button
+            onClick={sendInviteLink}
+            className="h-full bg-base-green border border-black rounded-md py-2 px-3"
+          >
             <LinkIcon className="h-5" />
           </button>
         </div>
