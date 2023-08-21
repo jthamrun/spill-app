@@ -19,6 +19,8 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase.config";
 import LoadingContext from "../store/loading-context/loading-context";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 type Props = {
   id: string;
@@ -68,6 +70,12 @@ function ExpenseItemMenu({ id, items }: Props) {
       setTimeout(() => {
         hideLoader();
       }, 1000);
+      toast.success("Successfully Deleted!", {
+        autoClose: 2000, //2 seconds
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+      });
     }
   };
 
@@ -112,6 +120,14 @@ function ExpenseItemMenu({ id, items }: Props) {
   return (
     <div className="space-y-3">
       <div className="flex flex-1 space-x-2">
+        <div className="toast-container">
+          <ToastContainer
+            limit={2}
+            bodyClassName={() =>
+              "flex space-x-2 items-center font-quicksand font-bold pl-2"
+            }
+          />
+        </div>
         <div className="flex grow shrink-0 items-center p-2 h-10 rounded-md pace-x-2 border border-black focus-within:ring-1 focus-within:ring-black">
           <input
             className="font-quicksand text-black focus:outline-none w-full"

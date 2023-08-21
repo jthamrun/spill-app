@@ -22,6 +22,7 @@ import {
 } from "@firebase/firestore";
 import { db } from "../../firebase.config";
 import LoadingContext from "../store/loading-context/loading-context";
+import DeleteExpenseItemMenuCardModal from "./DeleteExpenseItemMenuCardModal";
 
 type Props = {
   item?: ExpenseItem;
@@ -32,6 +33,12 @@ function ExpenseItemMenuCard({ item, onDelete }: Props) {
   const { showLoader, hideLoader } = useContext(LoadingContext);
   const [isDetailedItem, setIsDetailedItem] = useState(false);
   const [isItemDropdown, setIsItemDropdown] = useState(false);
+  const [
+    isDeleteExpenseItemMenuCardModal,
+    setIsDeleteExpenseItemMenuCardModal,
+  ] = useState(false);
+  const [isDeleteExpenseItemMenuCard, setIsDeleteExpenseItemMenuCard] =
+    useState(false);
   //const itemDetail = useRef<HTMLInputElement>(null);
   const [isEditInfo, setIsEditInfo] = useState(false);
   const [groups, setGroups] = useState<ExpenseItemGroup[]>([]);
@@ -103,6 +110,12 @@ function ExpenseItemMenuCard({ item, onDelete }: Props) {
     };
   }, []); // when component initally mounted
 
+  useEffect(() => {
+    if (isDeleteExpenseItemMenuCard) {
+      onDelete!(item!);
+    }
+  }, [isDeleteExpenseItemMenuCard]);
+
   // useEffect(() => {
   //   // only add the event listener when the dropdown is opened
   //   if (!isDetailedItem && !isItemDropdown) return;
@@ -119,7 +132,7 @@ function ExpenseItemMenuCard({ item, onDelete }: Props) {
 
   return (
     <>
-      {isDetailedItem && (
+      {(isDetailedItem == true || isItemDropdown == true) && (
         <div
           className="absolute top-0 left-0 w-screen h-screen opacity-50"
           onClick={() => {
@@ -183,7 +196,7 @@ function ExpenseItemMenuCard({ item, onDelete }: Props) {
               </button>
               <button
                 onClick={() => {
-                  onDelete!(item!);
+                  setIsDeleteExpenseItemMenuCardModal(true);
                 }}
                 className="hover:bg-white rounded-md duration-150 px-2"
               >
@@ -197,6 +210,12 @@ function ExpenseItemMenuCard({ item, onDelete }: Props) {
           item={item}
           isOpen={isEditInfo}
           setOn={setIsEditInfo}
+        />
+
+        <DeleteExpenseItemMenuCardModal
+          isOpen={isDeleteExpenseItemMenuCardModal}
+          setOn={setIsDeleteExpenseItemMenuCardModal}
+          confirmDelete={setIsDeleteExpenseItemMenuCard}
         />
       </div>
     </>
