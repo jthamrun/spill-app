@@ -13,6 +13,7 @@ export type User = {
 
 export type UserExpenseGroup = {
   user_id: string;
+  name: string;
   total_amount: number;
 };
 
