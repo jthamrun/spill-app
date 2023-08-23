@@ -5,6 +5,7 @@ import { collection, getDocs, limit, query, where } from "@firebase/firestore";
 import PersonGroupInfoCard from "./PersonGroupInfoCard";
 import { ExpenseItemGroup, User, UserExpenseGroup } from "../../store/types";
 import { db } from "../../../firebase.config";
+import PersonGroupInfoCarouselCard from "./PersonGroupInfoCarouselCard";
 
 type Props = {
   placeholder: string;
@@ -17,12 +18,13 @@ function AddPersonToGroupContent({ placeholder, group, setGroup }: Props) {
   const [people, setPeople] = useState<User[]>([]);
 
   const addPerson = (id: string, name: string) => {
+    setPeople((prev) => prev.filter((user) => user.id !== id));
     setGroup((prev) => {
       let arr = prev.splitAmount ?? [];
       arr.push({
         user_id: id,
         name,
-        total_amount: 12.99,
+        total_amount: 0,
       } as UserExpenseGroup);
       return {
         ...prev,
@@ -31,11 +33,40 @@ function AddPersonToGroupContent({ placeholder, group, setGroup }: Props) {
     });
   };
 
-  const removePerson = (id: string) => {
+  const removePerson = (id: string, name: string) => {
+    setPeople((prev) => {
+      return [
+        ...prev,
+        {
+          id,
+          email: "",
+          name,
+        },
+      ];
+    });
     setGroup((prev) => {
       return {
         ...prev,
         splitAmount: prev.splitAmount?.filter((user) => user.user_id !== id),
+      };
+    });
+  };
+
+  const updateUserGroupAmount = (id: string, amount: number) => {
+    setGroup((prev) => {
+      let userGroupList = prev.splitAmount?.map((user) => {
+        if (user.user_id === id) {
+          return {
+            ...user,
+            total_amount: amount,
+          };
+        }
+        return user;
+      });
+
+      return {
+        ...prev,
+        splitAmount: userGroupList,
       };
     });
   };
@@ -63,11 +94,13 @@ function AddPersonToGroupContent({ placeholder, group, setGroup }: Props) {
       );
       const users: Array<User> = [];
       querySnapshot.forEach((doc) => {
-        users.push({
-          id: doc.id,
-          email: doc.data().email,
-          name: doc.data().name,
-        });
+        if (!group.splitAmount?.some((user) => user.user_id === doc.id)) {
+          users.push({
+            id: doc.id,
+            email: "",
+            name: doc.data().name,
+          });
+        }
       });
       setPeople(users);
     };
@@ -89,45 +122,37 @@ function AddPersonToGroupContent({ placeholder, group, setGroup }: Props) {
         />
         <MagnifyingGlassIcon className="h-5" />
       </div>
-      <div className="mt-4 space-y-3">
-        {people.map((person, index) => (
-          <PersonGroupInfoCard
-            key={index}
-            isSelected={
-              group.splitAmount?.some((user) => user.user_id === person.id) ??
-              false
-            }
-            addPerson={() => {
-              addPerson(person.id!, person.name);
-            }}
-            removePerson={() => {
-              removePerson(person.id!);
-            }}
-            name={person.name}
-          />
-        ))}
+      <div className="mt-4 space-y-3 h-[300px]">
+        {people.length == 0 ? (
+          <p className="font-quicksand font-semibold text-center">
+            There's nothing here...
+          </p>
+        ) : (
+          people.map((person, index) => (
+            <PersonGroupInfoCard
+              key={index}
+              addPerson={() => {
+                addPerson(person.id!, person.name);
+              }}
+              name={person.name}
+            />
+          ))
+        )}
       </div>
       <div className="pt-6 flex flex-row space-x-10 overflow-x-auto">
         {group.splitAmount?.map((user) => {
           return (
-            // need to add logic to edit the amount in splitAmount
-            <div className="flex flex-col items-center">
-              <div className="flex h-20 w-20 rounded-full justify-center items-center bg-base-green">
-                <h1 className="text-2xl font-quicksand font-bold">
-                  {user.name
-                    .split(" ")
-                    .map((name) => name.charAt(0))
-                    .join("")}
-                </h1>
-              </div>
-              <div className="flex mt-2 w-32">
-                <p className="px-1 w-6/12 border border-transparent border-r-0 rounded-l-md text-left bg-base-green">Amount</p>
-                <input
-                  className="px-1 w-6/12 font-quicksand text-black text-center focus:outline-none border border-l-0 border-base-green rounded-r-md"
-                  type="text"
-                />
-              </div>
-            </div>
+            <PersonGroupInfoCarouselCard
+              name={user.name}
+              totalAmount={user.total_amount}
+              disableAmount={group.splitOption === "equal"}
+              removePerson={() => {
+                removePerson(user.user_id, user.name);
+              }}
+              updateUserGroupAmount={(total_amount: number) => {
+                updateUserGroupAmount(user.user_id, total_amount);
+              }}
+            />
           );
         })}
       </div>
