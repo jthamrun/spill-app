@@ -1,15 +1,23 @@
 import { useState, Dispatch, SetStateAction, useEffect } from "react";
 import ReactPortal from "../ReactPortal";
 import { XCircleIcon } from "@heroicons/react/24/outline";
-import SearchPeopleContent from "../SearchPeople/SearchPeopleContent";
+import AddPersonToGroupContent from "./AddPersonToGroup/AddPersonToGroupContent";
+import { ExpenseItemGroup } from "../store/types";
 
 // Define the props of Modal.
 type ModalProps = {
   isOpen: boolean;
   setOn: Dispatch<SetStateAction<boolean>>;
+  group: ExpenseItemGroup;
+  setGroup: Dispatch<SetStateAction<ExpenseItemGroup>>;
 };
 // Modal component.
-const AddPersonToItemCardModal = ({ isOpen, setOn }: ModalProps) => {
+const AddPersonToItemCardModal = ({
+  isOpen,
+  group,
+  setOn,
+  setGroup,
+}: ModalProps) => {
   // Manage button enabled/disabled state.
   const [disabled, setDisabled] = useState<boolean>(false);
 
@@ -30,7 +38,11 @@ const AddPersonToItemCardModal = ({ isOpen, setOn }: ModalProps) => {
           <h1 className="font-quicksand font-bold text-2xl text-center mb-4">
             Add People to Item Group
           </h1>
-          <SearchPeopleContent placeholder="Search People, @username" />
+          <AddPersonToGroupContent
+            group={group}
+            setGroup={setGroup}
+            placeholder="Search People, @username"
+          />
         </div>
       </>
     </ReactPortal>
