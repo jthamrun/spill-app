@@ -122,7 +122,11 @@ function AddPersonToGroupContent({ placeholder, group, setGroup }: Props) {
         />
         <MagnifyingGlassIcon className="h-5" />
       </div>
-      <div className="mt-4 space-y-3 h-[300px]">
+      <div
+        className={`mt-4 space-y-3 ${
+          people.length == 0 ? "h-[50px]" : "h-[300px]"
+        }`}
+      >
         {people.length == 0 ? (
           <p className="font-quicksand font-semibold text-center">
             There's nothing here...
@@ -139,7 +143,7 @@ function AddPersonToGroupContent({ placeholder, group, setGroup }: Props) {
           ))
         )}
       </div>
-      <div className="pt-6 flex flex-row space-x-10 overflow-x-auto">
+      <div className="pt-6 grid grid-cols-2 min-[900px]:grid-cols-3 overflow-x-auto gap-y-8">
         {group.splitAmount?.map((user) => {
           return (
             <PersonGroupInfoCarouselCard
