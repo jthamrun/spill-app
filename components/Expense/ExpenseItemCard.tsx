@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { UsersIcon, ArrowsRightLeftIcon } from "@heroicons/react/20/solid";
+import {
+  UsersIcon,
+  ArrowsRightLeftIcon,
+  CheckBadgeIcon,
+  ArrowPathIcon,
+} from "@heroicons/react/20/solid";
 import { ExpenseItemGroup } from "../store/types";
 import AddPersonToItemCardModal from "./AddPersonToItemCardModal";
+import { doc, setDoc} from "firebase/firestore";
+import { db } from "../../firebase.config";
 
 type Props = {
   group?: ExpenseItemGroup;
@@ -17,6 +24,8 @@ function ExpenseItemCard({ group: personGroup, itemAmount }: Props) {
     splitAmount: [],
   });
 
+  const [isGroupEdited, setIsGroupEdited] = useState<boolean>(false);
+  const [loadingSpinner, setLoadingSpinner] = useState<boolean>(false);
   const [equalSplit, setEqualSplit] = useState<boolean>(
     group.splitOption == "equal"
   );
@@ -49,13 +58,34 @@ function ExpenseItemCard({ group: personGroup, itemAmount }: Props) {
     setEqualSplit((prev) => !prev);
   };
 
+  const updateGroupInFirestore = async () => {
+    try {
+      setLoadingSpinner(true);
+      console.log("updating group in firestore...");
+      
+      // await setDoc(
+      //   doc(db, "expense-item-groups", group.group_id as string),
+      //   group,
+      //   {
+      //     merge: true,
+      //   }
+      // );
+    }catch(err) {
+      
+    }finally {
+      setLoadingSpinner(false);
+      setIsGroupEdited(false);
+    }
+  };
+
   useEffect(() => {
-    console.log("updating group info in database...");
+    
+    // if any changes occur to group, set isGroupEdited to true
+    !isGroupEdited && setIsGroupEdited(true);
   }, [group]);
 
   useEffect(() => {
     // update equal amount when the number of users involved in group changes
-    console.log("updating equal amount...");
 
     equalSplit &&
       setGroup((prev) => {
@@ -111,6 +141,16 @@ function ExpenseItemCard({ group: personGroup, itemAmount }: Props) {
           }`}
         >
           <ArrowsRightLeftIcon className="h-5" />
+        </button>
+        <button
+          onClick={updateGroupInFirestore}
+          disabled={!isGroupEdited}
+          className="border border-black p-2 rounded-md bg-white"
+        >
+          {loadingSpinner ? <svg className="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+  <ArrowPathIcon />
+</svg> : <CheckBadgeIcon className="h-5" />}
+          
         </button>
       </div>
 

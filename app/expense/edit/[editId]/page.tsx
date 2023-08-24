@@ -1,11 +1,12 @@
-"use client";
-import { useParams } from "next/navigation";
 import EditExpenseComponent from "../../../../components/Expense/EditExpenseComponent";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../../../pages/api/auth/[...nextauth]";
 
 const editExpensePage = async () => {
-  const params = useParams()!;
 
-  return <EditExpenseComponent id={params.editId as string} />;
+  const session = await getServerSession(authOptions) as any;
+
+  return <EditExpenseComponent currentUser={session.user.id}/>;
 };
 
 export default editExpensePage;
