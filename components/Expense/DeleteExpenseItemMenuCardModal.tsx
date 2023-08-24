@@ -15,7 +15,7 @@ const DeleteExpenseItemMenuCardModal = ({
   confirmDelete,
 }: ModalProps) => {
   // Manage button enabled/disabled state.
-  const [disabled, setDisabled] = useState<boolean>(false);
+  const [disabled, setDisabled] = useState<boolean>(true);
 
   // Return null if isOpen props from parent is false.
   if (!isOpen) return null;
@@ -27,7 +27,6 @@ const DeleteExpenseItemMenuCardModal = ({
           <button
             className="self-end -mt-5 mb-5 -mr-2"
             onClick={() => setOn(false)}
-            disabled={disabled}
           >
             <XCircleIcon className="h-6 " />
           </button>
@@ -49,11 +48,11 @@ const DeleteExpenseItemMenuCardModal = ({
 
               <button
                 className="border border-black rounded-md py-2 px-4 bg-error-red"
-                disabled={disabled}
                 onClick={() => {
                   setOn(false);
                   confirmDelete(true);
                 }}
+                disabled={disabled}
               >
                 <p className="font-quicksand font-bold">Delete</p>
               </button>
