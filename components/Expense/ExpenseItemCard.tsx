@@ -77,7 +77,11 @@ function ExpenseItemCard({ group: personGroup, itemAmount }: Props) {
 
   return (
     <div className="flex items-center justify-between space-x-2">
-      <div className="flex flex-1 flex-wrap gap-1 border border-black p-2 rounded-md bg-white items-center">
+      <div
+        className={`flex flex-1 flex-wrap gap-1 border border-black p-2 rounded-md bg-white items-center ${
+          group.splitAmount!.length == 0 ? "h-12" : ""
+        }`}
+      >
         {group?.splitAmount?.map((splitItem) => (
           <p className="border border-black rounded-xl px-2 py-1 bg-base-green font-quicksand font-bold">
             {splitItem.name
@@ -88,12 +92,6 @@ function ExpenseItemCard({ group: personGroup, itemAmount }: Props) {
             {/* will use user_id for now */}
           </p>
         ))}
-        <p className="border border-black rounded-xl px-2 py-1 bg-base-green font-quicksand font-bold">
-          JT
-        </p>
-        <p className="border border-black rounded-xl px-2 py-1 bg-base-green font-quicksand font-bold">
-          JS
-        </p>
       </div>
 
       <div className="flex space-x-1">

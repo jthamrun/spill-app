@@ -25,7 +25,7 @@ const PersonGroupInfoCarouselCard = ({
   // updating total_amount to user group doesnt work
   return (
     <div className="flex flex-col items-center">
-      <button className="self-end -mt-5 mr-2" onClick={removePerson}>
+      <button className="self-end mr-4" onClick={removePerson}>
         <XMarkIcon className="h-4" />
       </button>
       <div className="flex h-20 w-20 rounded-full justify-center items-center bg-base-green">
