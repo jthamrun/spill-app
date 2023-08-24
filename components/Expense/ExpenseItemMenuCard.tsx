@@ -27,9 +27,16 @@ import DeleteExpenseItemMenuCardModal from "./DeleteExpenseItemMenuCardModal";
 type Props = {
   item?: ExpenseItem;
   onDelete?: (_: ExpenseItem) => Promise<void>;
+  currentUser: string;
+  creatorId: string;
 };
 
-function ExpenseItemMenuCard({ item, onDelete }: Props) {
+function ExpenseItemMenuCard({
+  item,
+  onDelete,
+  currentUser,
+  creatorId,
+}: Props) {
   const { showLoader, hideLoader } = useContext(LoadingContext);
   const [isDetailedItem, setIsDetailedItem] = useState(false);
   const [isItemDropdown, setIsItemDropdown] = useState(false);
@@ -113,6 +120,9 @@ function ExpenseItemMenuCard({ item, onDelete }: Props) {
   useEffect(() => {
     if (isDeleteExpenseItemMenuCard) {
       onDelete!(item!);
+      setIsDeleteExpenseItemMenuCard(false);
+      setIsDeleteExpenseItemMenuCardModal(false);
+      setIsItemDropdown(false);
     }
   }, [isDeleteExpenseItemMenuCard]);
 
@@ -171,10 +181,15 @@ function ExpenseItemMenuCard({ item, onDelete }: Props) {
         {isDetailedItem && (
           <div className="flex flex-col space-y-1 border border-black p-2 rounded-md bg-light2-green mt-1">
             {groups.map((group) => (
-              <ExpenseItemCard key={group.group_id} group={group} />
+              <ExpenseItemCard
+                key={group.group_id}
+                group={group}
+                currentUser={currentUser}
+                creatorId={creatorId}
+              />
             ))}
-            <ExpenseItemCard />
-            <ExpenseItemCard />
+            <ExpenseItemCard currentUser={currentUser} creatorId={creatorId} />
+            <ExpenseItemCard currentUser={currentUser} creatorId={creatorId} />
           </div>
         )}
 

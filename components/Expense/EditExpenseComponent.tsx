@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   DocumentData,
   DocumentSnapshot,
@@ -19,7 +19,7 @@ import LoadingContext from "../store/loading-context/loading-context";
 import { useParams, useRouter } from "next/navigation";
 import { randomUUID } from "crypto";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+//import "react-toastify/dist/ReactToastify.css";
 
 type Props = {
   currentUser: string; // session.user.id
@@ -242,7 +242,12 @@ const EditExpenseComponent = ({ currentUser }: Props) => {
       </div>
 
       <div className="h-full overflow-auto border border-black rounded-md space-y-4 p-4 m-auto">
-        <ExpenseItemMenu id={id} items={items} />
+        <ExpenseItemMenu
+          id={id}
+          items={items}
+          currentUser={currentUser}
+          creatorId={expense?.creator_id || ""}
+        />
       </div>
 
       <EditExpenseInfoModal

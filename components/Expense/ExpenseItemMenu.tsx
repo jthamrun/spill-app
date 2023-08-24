@@ -25,9 +25,11 @@ import "react-toastify/dist/ReactToastify.css";
 type Props = {
   id: string;
   items: string[];
+  currentUser: string;
+  creatorId: string;
 };
 
-function ExpenseItemMenu({ id, items }: Props) {
+function ExpenseItemMenu({ id, items, currentUser, creatorId }: Props) {
   const [itemField, setItemField] = useState("");
   const [priceField, setPriceField] = useState("");
   const [quantityField, setQuantityField] = useState("");
@@ -63,9 +65,16 @@ function ExpenseItemMenu({ id, items }: Props) {
     // delete expense item from db and local storage
     showLoader();
     try {
+      // console.log("Deleting");
       await deleteDoc(doc(db, "expense-items", item.item_id));
       setItemsList((prev) => prev.filter((i) => i.item_id !== item.item_id));
     } catch (err) {
+      toast.error("Error Deleting", {
+        autoClose: 2000, //2 seconds
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+      });
     } finally {
       setTimeout(() => {
         hideLoader();
@@ -172,11 +181,25 @@ function ExpenseItemMenu({ id, items }: Props) {
             key={item.item_id}
             item={item}
             onDelete={deleteExpenseItem}
+            currentUser={currentUser}
+            creatorId={creatorId}
           />
         ))}
-        <ExpenseItemMenuCard />
-        <ExpenseItemMenuCard />
-        <ExpenseItemMenuCard />
+        <ExpenseItemMenuCard
+          onDelete={deleteExpenseItem}
+          currentUser={currentUser}
+          creatorId={creatorId}
+        />
+        <ExpenseItemMenuCard
+          onDelete={deleteExpenseItem}
+          currentUser={currentUser}
+          creatorId={creatorId}
+        />
+        <ExpenseItemMenuCard
+          onDelete={deleteExpenseItem}
+          currentUser={currentUser}
+          creatorId={creatorId}
+        />
       </div>
     </div>
   );
