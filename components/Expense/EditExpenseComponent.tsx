@@ -1,3 +1,4 @@
+"use client"
 import {
   DocumentData,
   DocumentSnapshot,
@@ -15,16 +16,19 @@ import ExpenseItemMenu from "./ExpenseItemMenu";
 import EditExpenseInfoModal from "./EditExpenseInfoModal";
 import moment from "moment";
 import LoadingContext from "../store/loading-context/loading-context";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { randomUUID } from "crypto";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 type Props = {
-  id: string;
+  currentUser: string; // session.user.id
 };
 
-const EditExpenseComponent = ({ id }: Props) => {
+const EditExpenseComponent = ({ currentUser }: Props) => {
+  const params = useParams()!;
+  const id = params.editId as string;
+
   const router = useRouter();
   const [expense, setExpense] = useState<Expense>();
   const [inviteId, setInviteId] = useState<string>("");
