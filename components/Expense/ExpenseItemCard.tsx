@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   UsersIcon,
   ArrowsRightLeftIcon,
@@ -7,7 +7,7 @@ import {
 } from "@heroicons/react/20/solid";
 import { ExpenseItemGroup } from "../store/types";
 import AddPersonToItemCardModal from "./AddPersonToItemCardModal";
-import { doc, setDoc} from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase.config";
 
 type Props = {
@@ -16,6 +16,7 @@ type Props = {
 };
 
 function ExpenseItemCard({ group: personGroup, itemAmount }: Props) {
+  const didRender = useRef<boolean>(false);
   const [isAddPersonModal, setIsAddPersonModal] = useState(false);
   const [group, setGroup] = useState<ExpenseItemGroup>({
     group_id: "u2131ms",
@@ -62,27 +63,43 @@ function ExpenseItemCard({ group: personGroup, itemAmount }: Props) {
     try {
       setLoadingSpinner(true);
       console.log("updating group in firestore...");
-      
+
       // await setDoc(
       //   doc(db, "expense-item-groups", group.group_id as string),
-      //   group,
+      //   {
+      //     splitAmount: group.splitAmount,
+      //     splitOption: group.splitOption,
+      //   },
       //   {
       //     merge: true,
       //   }
       // );
-    }catch(err) {
-      
-    }finally {
+    } catch (err) {
+    } finally {
       setLoadingSpinner(false);
       setIsGroupEdited(false);
     }
   };
 
   useEffect(() => {
-    
     // if any changes occur to group, set isGroupEdited to true
-    !isGroupEdited && setIsGroupEdited(true);
-  }, [group]);
+
+    // if(!didRender.current) {
+    //   didRender.current = true;
+    // } else {
+    //   !isGroupEdited && setIsGroupEdited(true);
+    // }
+
+    // for now, this works, but it is not recommended to use cleanup for doing the work
+    // in production, useEffect doesn't run twice, therefore, we can remove this cleanup function later
+    return () => {
+      if (!didRender.current) {
+        didRender.current = true;
+      } else {
+        !isGroupEdited && setIsGroupEdited(true);
+      }
+    };
+  }, [group.splitAmount, group.splitOption]);
 
   useEffect(() => {
     // update equal amount when the number of users involved in group changes
@@ -147,10 +164,18 @@ function ExpenseItemCard({ group: personGroup, itemAmount }: Props) {
           disabled={!isGroupEdited}
           className="border border-black p-2 rounded-md bg-white"
         >
-          {loadingSpinner ? <svg className="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-  <ArrowPathIcon />
-</svg> : <CheckBadgeIcon className="h-5" />}
-          
+          {loadingSpinner ? (
+            <svg
+              className="animate-spin h-5 w-5 text-black"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <ArrowPathIcon />
+            </svg>
+          ) : (
+            <CheckBadgeIcon className="h-5" />
+          )}
         </button>
       </div>
 

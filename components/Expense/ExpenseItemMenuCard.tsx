@@ -171,7 +171,7 @@ function ExpenseItemMenuCard({ item, onDelete }: Props) {
         {isDetailedItem && (
           <div className="flex flex-col space-y-1 border border-black p-2 rounded-md bg-light2-green mt-1">
             {groups.map((group) => (
-              <ExpenseItemCard key={group.group_id} group={group} />
+              <ExpenseItemCard key={group.group_id} group={group} itemAmount={item?.amount}/>
             ))}
             <ExpenseItemCard />
             <ExpenseItemCard />
