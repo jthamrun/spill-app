@@ -4,6 +4,8 @@ import {
   ArrowsRightLeftIcon,
   CheckBadgeIcon,
   ArrowPathIcon,
+  UserPlusIcon,
+  UserMinusIcon,
 } from "@heroicons/react/20/solid";
 import { ExpenseItemGroup } from "../store/types";
 import AddPersonToItemCardModal from "./AddPersonToItemCardModal";
@@ -13,10 +15,17 @@ import { db } from "../../firebase.config";
 type Props = {
   group?: ExpenseItemGroup;
   itemAmount?: number;
+  currentUser: string;
+  creatorId: string;
 };
 
-function ExpenseItemCard({ group: personGroup, itemAmount }: Props) {
-  const didRender = useRef<boolean>(false);
+function ExpenseItemCard({
+  group: personGroup,
+  itemAmount,
+  currentUser,
+  creatorId,
+}: Props) {
+    const didRender = useRef<boolean>(false);
   const [isAddPersonModal, setIsAddPersonModal] = useState(false);
   const [group, setGroup] = useState<ExpenseItemGroup>({
     group_id: "u2131ms",
@@ -141,43 +150,54 @@ function ExpenseItemCard({ group: personGroup, itemAmount }: Props) {
         ))}
       </div>
 
-      <div className="flex space-x-1">
-        <button
-          className="border border-black p-2  rounded-md bg-light-green"
-          onClick={() => setIsAddPersonModal(true)}
-        >
-          <UsersIcon className="h-5" />
-        </button>
-        {/* <button className="border border-black p-2  rounded-md bg-error-red">
+      {creatorId === currentUser ? (
+        <div className="flex space-x-1">
+          <button
+            className="border border-black p-2  rounded-md bg-light-green"
+            onClick={() => setIsAddPersonModal(true)}
+          >
+            <UsersIcon className="h-5" />
+          </button>
+          {/* <button className="border border-black p-2  rounded-md bg-error-red">
           <UserMinusIcon className="h-5" />
         </button> */}
-        <button
-          onClick={setEqualSplitHandler}
-          className={`border border-black p-2  rounded-md ${
-            equalSplit ? "bg-base-green" : "bg-white"
-          }`}
-        >
-          <ArrowsRightLeftIcon className="h-5" />
-        </button>
-        <button
-          onClick={updateGroupInFirestore}
-          disabled={!isGroupEdited}
-          className="border border-black p-2 rounded-md bg-white"
-        >
-          {loadingSpinner ? (
-            <svg
-              className="animate-spin h-5 w-5 text-black"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <ArrowPathIcon />
-            </svg>
-          ) : (
-            <CheckBadgeIcon className="h-5" />
-          )}
-        </button>
-      </div>
+          <button
+            onClick={setEqualSplitHandler}
+            className={`border border-black p-2  rounded-md ${
+              equalSplit ? "bg-base-green" : "bg-white"
+            }`}
+          >
+            <ArrowsRightLeftIcon className="h-5" />
+          </button>
+          <button
+            onClick={updateGroupInFirestore}
+            disabled={!isGroupEdited}
+            className="border border-black p-2 rounded-md bg-white"
+          >
+            {loadingSpinner ? (
+              <svg
+                className="animate-spin h-5 w-5 text-black"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <ArrowPathIcon />
+              </svg>
+            ) : (
+              <CheckBadgeIcon className="h-5" />
+            )}
+          </button>
+        </div>
+      ) : (
+        <div className="flex space-x-1">
+          <button className="border border-black p-2  rounded-md bg-light-green">
+            <UserPlusIcon className="h-5" />
+          </button>
+          <button className="border border-black p-2  rounded-md bg-error-red">
+            <UserMinusIcon className="h-5" />
+          </button>
+        </div>
+      )}
 
       {isAddPersonModal && (
         <AddPersonToItemCardModal
