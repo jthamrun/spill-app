@@ -93,9 +93,7 @@ const EditExpenseComponent = ({ currentUser }: Props) => {
     } catch (err) {
       // router.push('/dashboard')
     } finally {
-      setTimeout(() => {
-        hideLoader();
-      }, 1000);
+      hideLoader();
     }
   };
 
@@ -131,27 +129,25 @@ const EditExpenseComponent = ({ currentUser }: Props) => {
       });
     } catch (err) {
     } finally {
-      setTimeout(() => {
-        hideLoader();
-      }, 1000);
+      hideLoader();
     }
   };
 
   const sendInviteLink = async () => {
     try {
       let invite_id: string = inviteId;
-      // if (!invite_id) {
-      //   invite_id = randomUUID();
+      if (!invite_id) {
+        invite_id = randomUUID();
 
-      //   await setDoc(
-      //     doc(db, "expenses", id),
-      //     {
-      //       inviteId: invite_id,
-      //     },
-      //     { merge: true }
-      //   );
-      //   setInviteId(invite_id);
-      // }
+        await setDoc(
+          doc(db, "expenses", id),
+          {
+            inviteId: invite_id,
+          },
+          { merge: true }
+        );
+        setInviteId(invite_id);
+      }
 
       // copy to clipboard
       await navigator.clipboard.writeText(invite_id);
@@ -210,7 +206,7 @@ const EditExpenseComponent = ({ currentUser }: Props) => {
           <div className="h-[1px] bg-black w-full"></div>
           <div className="py-6 flex space-x-10 justify-center min-[900px]:px-16">
             <p className="font-quicksand font-bold">{`$${
-              expense?.total_amount ?? 0
+              (expense?.total_amount)?.toFixed(2) ?? 0
             }`}</p>
             <p className="font-quicksand font-medium">
               <span className="font-bold">{users.length}</span> Friends

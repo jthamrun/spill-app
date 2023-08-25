@@ -27,12 +27,7 @@ function ExpenseItemCard({
 }: Props) {
   const didRender = useRef<boolean>(false);
   const [isAddPersonModal, setIsAddPersonModal] = useState(false);
-  const [group, setGroup] = useState<ExpenseItemGroup>({
-    group_id: "u2131ms",
-    item_id: "313sserkr",
-    splitOption: "equal",
-    splitAmount: [],
-  });
+  const [group, setGroup] = useState<ExpenseItemGroup>(personGroup!);
 
   const [isGroupEdited, setIsGroupEdited] = useState<boolean>(false);
   const [loadingSpinner, setLoadingSpinner] = useState<boolean>(false);
@@ -71,18 +66,17 @@ function ExpenseItemCard({
   const updateGroupInFirestore = async () => {
     try {
       setLoadingSpinner(true);
-      console.log("updating group in firestore...");
 
-      // await setDoc(
-      //   doc(db, "expense-item-groups", group.group_id as string),
-      //   {
-      //     splitAmount: group.splitAmount,
-      //     splitOption: group.splitOption,
-      //   },
-      //   {
-      //     merge: true,
-      //   }
-      // );
+      await setDoc(
+        doc(db, "expense-item-groups", group.group_id as string),
+        {
+          splitAmount: group.splitAmount,
+          splitOption: group.splitOption,
+        },
+        {
+          merge: true,
+        }
+      );
     } catch (err) {
     } finally {
       setLoadingSpinner(false);

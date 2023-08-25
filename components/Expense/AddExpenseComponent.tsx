@@ -5,13 +5,7 @@ import { StylesConfig } from "react-select";
 import makeAnimated from "react-select/animated";
 import chroma from "chroma-js";
 import CurrencyInput from "react-currency-input-field";
-import {
-  addDoc,
-  collection,
-  getDocs,
-  query,
-  where,
-} from "firebase/firestore";
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../firebase.config";
 import { AnySessionProps, Expense } from "../store/types";
 import { useRouter } from "next/navigation";
@@ -77,7 +71,7 @@ type Option = {
   color?: string;
 };
 
-const getUsers = async (val: string) => {
+const getUsers = async (val: string, creator_id: string) => {
   const searchArr = val.split(" ");
 
   for (var i = 0; i < searchArr.length; i++) {
@@ -96,12 +90,14 @@ const getUsers = async (val: string) => {
     )
   ).then((snapshot) => {
     snapshot.forEach((doc) => {
-      const data = doc.data();
-      options.push({
-        value: doc.id,
-        label: data.name,
-        color: chroma.random().hex(),
-      });
+      if (doc.id !== creator_id) {
+        const data = doc.data();
+        options.push({
+          value: doc.id,
+          label: data.name,
+          color: chroma.random().hex(),
+        });
+      }
     });
   });
 
@@ -110,10 +106,11 @@ const getUsers = async (val: string) => {
 
 const loadOptions = (
   inputValue: string,
+  creator_id: string,
   callback: (options: Option[]) => void
 ) => {
   setTimeout(async () => {
-    callback(await getUsers(inputValue));
+    callback(await getUsers(inputValue, creator_id));
   }, 500);
 };
 
@@ -125,7 +122,7 @@ const AddExpenseComponent = ({ session }: AnySessionProps) => {
   const [subtotal, setSubtotal] = useState<number>(0);
   const [tax, setTax] = useState<number>(0.1);
   const [tips, setTips] = useState<number>(0);
-  const [users, setUsers] = useState<Option[]>(); // users involved in this expense
+  const [users, setUsers] = useState<Option[]>([]); // users involved in this expense
 
   const [didErrorOccur, setDidErrorOccur] = useState(false);
 
@@ -133,11 +130,11 @@ const AddExpenseComponent = ({ session }: AnySessionProps) => {
     // add the current expense into firebase
     await addDoc(collection(db, "expenses"), {
       creator_id: session.user.id,
-      users: [],
+      users: users.map((user) => user.value),
       name,
       date: date?.toLocaleDateString() ?? null,
       subtotal_amount: subtotal,
-      total_amount: subtotal * tax + subtotal + tips,
+      total_amount: subtotal * (1 + tax) + tips,
       tax_amount: tax,
       tip_amount: tips,
       status: "ongoing",
@@ -249,10 +246,11 @@ const AddExpenseComponent = ({ session }: AnySessionProps) => {
               <CurrencyInput
                 id="tips"
                 prefix="$"
+                defaultValue={tips}
                 placeholder="Enter Tip"
                 decimalsLimit={2}
                 onValueChange={(val, _) => {
-                  val && setTips(parseFloat(val));
+                  setTips(parseFloat(val ?? "0"));
                 }}
                 className="font-quicksand font-medium border border-black rounded-md py-2 pl-4 pr-8 w-full"
               />
@@ -264,10 +262,11 @@ const AddExpenseComponent = ({ session }: AnySessionProps) => {
               <CurrencyInput
                 id="tax"
                 suffix="%"
+                defaultValue={"" + tax * 100}
                 placeholder="Enter Tax"
                 decimalsLimit={2}
                 onValueChange={(val, _) => {
-                  val && setTax(parseFloat(val) / 100);
+                  setTax(parseFloat(val ?? "0") / 100);
                 }}
                 className="font-quicksand font-medium border border-black rounded-md py-2 pl-4 pr-8 w-full"
               />
@@ -290,7 +289,12 @@ const AddExpenseComponent = ({ session }: AnySessionProps) => {
                 styles={colourStyles}
                 cacheOptions
                 defaultOptions
-                loadOptions={loadOptions}
+                loadOptions={(
+                  inputValue: string,
+                  callback: (_: Option[]) => void
+                ) => {
+                  loadOptions(inputValue, session.user.id, callback);
+                }}
                 onChange={(e) => {
                   setUsers(e as Option[]);
                 }}
@@ -301,7 +305,7 @@ const AddExpenseComponent = ({ session }: AnySessionProps) => {
 
           <button
             onClick={addExpense}
-            disabled
+            disabled={!(name && date && subtotal)}
             className="disabled:bg-gray-500 disabled:border-gray-200 font-quicksand font-bold rounded-md border-2 border-black bg-base-green text-black py-2 mt-8 hover:-translate-y-0.5 duration-150 ease-out"
           >
             Add

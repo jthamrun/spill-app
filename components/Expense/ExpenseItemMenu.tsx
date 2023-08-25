@@ -185,7 +185,7 @@ function ExpenseItemMenu({ id, items, currentUser, creatorId }: Props) {
             creatorId={creatorId}
           />
         ))}
-        <ExpenseItemMenuCard
+        {/* <ExpenseItemMenuCard
           onDelete={deleteExpenseItem}
           currentUser={currentUser}
           creatorId={creatorId}
@@ -199,7 +199,7 @@ function ExpenseItemMenu({ id, items, currentUser, creatorId }: Props) {
           onDelete={deleteExpenseItem}
           currentUser={currentUser}
           creatorId={creatorId}
-        />
+        /> */}
       </div>
     </div>
   );

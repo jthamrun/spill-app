@@ -32,8 +32,6 @@ const ExpenseHistoryComponent = ({ session }: AnySessionProps) => {
             date: data.date,
             subtotal_amount: data.subtotal_amount,
             total_amount: data.total_amount,
-            tax_amount: data.tax_amount,
-            tip_amount: data.tip_amount,
             status: data.status,
           };
 
@@ -97,10 +95,6 @@ const ExpenseHistoryComponent = ({ session }: AnySessionProps) => {
           {expenses.map((expense) => (
             <ExpenseCard key={expense.expense_id} expense={expense} />
           ))}
-          <ExpenseCard />
-          <ExpenseCard />
-          <ExpenseCard />
-          <ExpenseCard />
         </div>
       </div>
     </div>

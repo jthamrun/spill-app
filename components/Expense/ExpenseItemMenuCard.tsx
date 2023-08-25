@@ -189,8 +189,8 @@ function ExpenseItemMenuCard({
                 creatorId={creatorId}
               />
             ))}
-            <ExpenseItemCard currentUser={currentUser} creatorId={creatorId} />
-            <ExpenseItemCard currentUser={currentUser} creatorId={creatorId} />
+            {/* <ExpenseItemCard currentUser={currentUser} creatorId={creatorId} />
+            <ExpenseItemCard currentUser={currentUser} creatorId={creatorId} /> */}
           </div>
         )}
 
