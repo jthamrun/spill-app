@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   UsersIcon,
   ArrowsRightLeftIcon,
@@ -25,6 +25,7 @@ function ExpenseItemCard({
   currentUser,
   creatorId,
 }: Props) {
+    const didRender = useRef<boolean>(false);
   const [isAddPersonModal, setIsAddPersonModal] = useState(false);
   const [group, setGroup] = useState<ExpenseItemGroup>({
     group_id: "u2131ms",
@@ -74,7 +75,10 @@ function ExpenseItemCard({
 
       // await setDoc(
       //   doc(db, "expense-item-groups", group.group_id as string),
-      //   group,
+      //   {
+      //     splitAmount: group.splitAmount,
+      //     splitOption: group.splitOption,
+      //   },
       //   {
       //     merge: true,
       //   }
@@ -88,8 +92,23 @@ function ExpenseItemCard({
 
   useEffect(() => {
     // if any changes occur to group, set isGroupEdited to true
-    !isGroupEdited && setIsGroupEdited(true);
-  }, [group]);
+
+    // if(!didRender.current) {
+    //   didRender.current = true;
+    // } else {
+    //   !isGroupEdited && setIsGroupEdited(true);
+    // }
+
+    // for now, this works, but it is not recommended to use cleanup for doing the work
+    // in production, useEffect doesn't run twice, therefore, we can remove this cleanup function later
+    return () => {
+      if (!didRender.current) {
+        didRender.current = true;
+      } else {
+        !isGroupEdited && setIsGroupEdited(true);
+      }
+    };
+  }, [group.splitAmount, group.splitOption]);
 
   useEffect(() => {
     // update equal amount when the number of users involved in group changes

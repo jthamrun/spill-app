@@ -184,6 +184,7 @@ function ExpenseItemMenuCard({
               <ExpenseItemCard
                 key={group.group_id}
                 group={group}
+                itemAmount={item?.amount}
                 currentUser={currentUser}
                 creatorId={creatorId}
               />
