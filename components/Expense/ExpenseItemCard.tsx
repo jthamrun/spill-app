@@ -25,7 +25,7 @@ function ExpenseItemCard({
   currentUser,
   creatorId,
 }: Props) {
-    const didRender = useRef<boolean>(false);
+  const didRender = useRef<boolean>(false);
   const [isAddPersonModal, setIsAddPersonModal] = useState(false);
   const [group, setGroup] = useState<ExpenseItemGroup>({
     group_id: "u2131ms",
