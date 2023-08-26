@@ -23,6 +23,12 @@ import {
 import { db } from "../../firebase.config";
 import LoadingContext from "../store/loading-context/loading-context";
 import DeleteExpenseItemMenuCardModal from "./DeleteExpenseItemMenuCardModal";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import {
+  addExpenseItemGroup,
+  selectExpenseItemGroups,
+  updateExpenseItemGroup,
+} from "../store/expenses/expenseSlice";
 
 type Props = {
   item?: ExpenseItem;
@@ -50,22 +56,33 @@ function ExpenseItemMenuCard({
   const [isEditInfo, setIsEditInfo] = useState(false);
   const [groups, setGroups] = useState<ExpenseItemGroup[]>([]);
 
+  const expenseItemGroups = useAppSelector(selectExpenseItemGroups);
+  const dispatch = useAppDispatch();
+
   const getExpenseItemGroups = async () => {
     showLoader();
     try {
       let groupList: ExpenseItemGroup[] = [];
       item?.groups.forEach(async (group_id: string) => {
-        const groupSnap = await getDoc(
-          doc(db, "expense-item-groups", group_id)
-        );
-        if (groupSnap.exists()) {
-          const groupData = groupSnap.data();
-          groupList.push({
-            group_id: groupSnap.id,
-            item_id: groupData.item_id,
-            splitOption: groupData.splitOption,
-            splitAmount: (groupData.splitAmount ?? []) as UserExpenseGroup[],
-          } as ExpenseItemGroup);
+        if (expenseItemGroups.some((group) => group.group_id === group_id)) {
+          groupList.push(
+            expenseItemGroups.find((group) => group.group_id === group_id)!
+          );
+        } else {
+          const groupSnap = await getDoc(
+            doc(db, "expense-item-groups", group_id)
+          );
+          if (groupSnap.exists()) {
+            const groupData = groupSnap.data();
+            const expenseItemGroup = {
+              group_id: groupSnap.id,
+              item_id: groupData.item_id,
+              splitOption: groupData.splitOption,
+              splitAmount: (groupData.splitAmount ?? []) as UserExpenseGroup[],
+            } as ExpenseItemGroup;
+            groupList.push(expenseItemGroup);
+            dispatch(addExpenseItemGroup(expenseItemGroup));
+          }
         }
       });
       setGroups(groupList);
@@ -81,16 +98,18 @@ function ExpenseItemMenuCard({
       const groupsArray: ExpenseItemGroup[] = groups;
       snap.forEach((doc) => {
         const group_data = doc.data();
+        const expenseItemGroup = {
+          group_id: doc.id,
+          item_id: group_data.item_id,
+          splitOption: group_data.splitOption,
+          splitAmount: (group_data.splitAmount ?? []) as UserExpenseGroup[],
+        } as ExpenseItemGroup;
         groupsArray.splice(
           groupsArray.findIndex((group) => group.group_id === doc.id),
           1,
-          {
-            group_id: doc.id,
-            item_id: group_data.item_id,
-            splitOption: group_data.splitOption,
-            splitAmount: (group_data.splitAmount ?? []) as UserExpenseGroup[],
-          } as ExpenseItemGroup
+          expenseItemGroup
         );
+        dispatch(updateExpenseItemGroup(expenseItemGroup));
       });
       setGroups(groupsArray);
     } catch (err) {

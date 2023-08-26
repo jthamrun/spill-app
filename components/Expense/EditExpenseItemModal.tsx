@@ -7,6 +7,8 @@ import { useParams } from "next/navigation";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase.config";
 import LoadingContext from "../store/loading-context/loading-context";
+import { useAppDispatch } from "../store/hooks";
+import { updateExpenseItem } from "../store/expenses/expenseSlice";
 
 // Define the props of Modal.
 type ModalProps = {
@@ -25,6 +27,8 @@ const EditExpenseItemModal = ({ item, isOpen, setOn }: ModalProps) => {
 
   const { showLoader, hideLoader } = useContext(LoadingContext);
 
+  const dispatch = useAppDispatch();
+
   const saveExpenseItemInfo = async () => {
     // loading component is not at the very top for this one, might be because of ReactPortal
     showLoader();
@@ -38,6 +42,14 @@ const EditExpenseItemModal = ({ item, isOpen, setOn }: ModalProps) => {
           quantity,
         },
         { merge: true }
+      );
+      dispatch(
+        updateExpenseItem({
+          ...item!,
+          name,
+          amount,
+          quantity,
+        })
       );
     } catch (err) {
     } finally {

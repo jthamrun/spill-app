@@ -9,6 +9,12 @@ import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../firebase.config";
 import { AnySessionProps, Expense } from "../store/types";
 import { useRouter } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import {
+  selectExpenses,
+  addExpense as add_expense,
+} from "../store/expenses/expenseSlice";
+import moment from "moment";
 
 const animatedComponents = makeAnimated();
 
@@ -117,8 +123,11 @@ const loadOptions = (
 const AddExpenseComponent = ({ session }: AnySessionProps) => {
   const router = useRouter();
 
+  const expenses = useAppSelector(selectExpenses);
+  const dispatch = useAppDispatch();
+
   const [name, setName] = useState("");
-  const [date, setDate] = useState<Date>();
+  const [date, setDate] = useState<Date>(new Date(moment().toLocaleString()));
   const [subtotal, setSubtotal] = useState<number>(0);
   const [tax, setTax] = useState<number>(0.1);
   const [tips, setTips] = useState<number>(0);
@@ -128,20 +137,38 @@ const AddExpenseComponent = ({ session }: AnySessionProps) => {
 
   const addExpense = async () => {
     // add the current expense into firebase
-    await addDoc(collection(db, "expenses"), {
+    const expense = {
       creator_id: session.user.id,
       users: users.map((user) => user.value),
       name,
-      date: date?.toLocaleDateString() ?? null,
+      date: date.toLocaleDateString(),
       subtotal_amount: subtotal,
       total_amount: subtotal * (1 + tax) + tips,
       tax_amount: tax,
       tip_amount: tips,
       status: "ongoing",
       items: [],
-    })
+      inviteId: "",
+    };
+    await addDoc(collection(db, "expenses"), expense)
       .then((doc) => {
         router.replace(`/expense/edit/${doc.id}`);
+        dispatch(
+          add_expense({
+            expense_id: doc.id,
+            creator_id: expense.creator_id,
+            name: expense.name,
+            date: expense.date,
+            subtotal_amount: expense.subtotal_amount,
+            total_amount: expense.total_amount,
+            tax_amount: expense.tax_amount,
+            tip_amount: expense.tip_amount,
+            status: expense.status,
+            users: expense.users,
+            items: expense.items,
+            inviteId: expense.inviteId,
+          } as Expense)
+        );
       })
       .catch(() => {
         setDidErrorOccur(true);

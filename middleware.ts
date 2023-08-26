@@ -66,7 +66,6 @@ export default withAuth(
           // if expense exists then check if user is part of this expense
           const doc = snapshot.docs[0].data();
           if (doc.users.includes(req.nextauth.token!.sub) || doc.creator_id === req.nextauth.token!.sub) {
-            console.log("no empty");
             return NextResponse.next();
           }
         }

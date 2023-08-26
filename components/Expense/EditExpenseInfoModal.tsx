@@ -11,28 +11,37 @@ import { XCircleIcon } from "@heroicons/react/24/outline";
 import { Expense } from "../store/types";
 import moment from "moment";
 import LoadingContext from "../store/loading-context/loading-context";
-import { doc, setDoc } from "firebase/firestore";
+import { deleteDoc, doc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase.config";
+import { useAppDispatch } from "../store/hooks";
+import { removeExpense, updateExpense } from "../store/expenses/expenseSlice";
+import { useRouter } from "next/navigation";
 
 // Define the props of Modal.
 type ModalProps = {
-  expense?: Expense;
+  expense: Expense;
   isOpen: boolean;
   setOn: Dispatch<SetStateAction<boolean>>;
 };
 // Modal component.
 const EditExpenseInfoModal = ({ expense, isOpen, setOn }: ModalProps) => {
+  const router = useRouter();
   const { isLoading, showLoader, hideLoader } = useContext(LoadingContext);
   // Manage button enabled/disabled state.
   const [disabled, setDisabled] = useState<boolean>(false);
-  const [name, setName] = useState(expense?.name ?? "");
-  const [date, setDate] = useState<Date>(new Date(expense?.date ?? moment().toLocaleString()));
-  const [subtotal, setSubtotal] = useState<number>(expense?.subtotal_amount ?? 0);
-  const [tax, setTax] = useState<number>(expense?.tax_amount ?? 0.1);
-  const [tips, setTips] = useState<number>(expense?.tip_amount ?? 0);
+  const [name, setName] = useState(expense.name ?? "");
+  const [date, setDate] = useState<Date>(
+    new Date(expense.date ?? moment().format("YYYY-MM-DDT00:00"))
+  );
+  const [subtotal, setSubtotal] = useState<number>(
+    expense.subtotal_amount ?? 0
+  );
+  const [tax, setTax] = useState<number>(expense.tax_amount ?? 0.1);
+  const [tips, setTips] = useState<number>(expense.tip_amount ?? 0);
+
+  const dispatch = useAppDispatch();
 
   const saveExpenseInfo = async () => {
-    showLoader();
     try {
       await setDoc(
         doc(db, "expenses", expense?.expense_id as string),
@@ -46,12 +55,33 @@ const EditExpenseInfoModal = ({ expense, isOpen, setOn }: ModalProps) => {
         },
         { merge: true }
       );
+      dispatch(
+        updateExpense({
+          ...expense,
+          name: name,
+          date: date.toLocaleDateString(),
+          total_amount: subtotal * (1 + tax) + tips,
+          subtotal_amount: subtotal,
+          tip_amount: tips,
+          tax_amount: tax,
+        })
+      );
     } catch (err) {
     } finally {
       setTimeout(() => {
-        hideLoader();
         setOn(false);
       }, 1000);
+    }
+  };
+
+  const deleteExpenseInfo = async () => {
+    try {
+      await deleteDoc(doc(db, "expenses", expense.expense_id));
+      dispatch(removeExpense(expense.expense_id));
+    } catch (err) {
+    } finally {
+      setOn(false);
+      router.push("/expense/history");
     }
   };
 
@@ -185,6 +215,7 @@ const EditExpenseInfoModal = ({ expense, isOpen, setOn }: ModalProps) => {
             </button>
             <button
               className="border border-black rounded-md py-2 px-4 bg-error-red"
+              onClick={deleteExpenseInfo}
               disabled={disabled}
             >
               <p className="font-quicksand font-bold">Delete</p>

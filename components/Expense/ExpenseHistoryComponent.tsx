@@ -1,65 +1,91 @@
 "use client";
-import { collection, getDocs, or, query, where } from "firebase/firestore";
+import {
+  collection,
+  getCountFromServer,
+  getDocs,
+  or,
+  query,
+  where,
+} from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../../firebase.config";
 import { AnySessionProps, Expense, ExpenseItem } from "../store/types";
 import ExpenseCard from "./ExpenseCard";
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { addExpense, selectExpenses } from "../store/expenses/expenseSlice";
 
 const ExpenseHistoryComponent = ({ session }: AnySessionProps) => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [search, setSearch] = useState("");
 
+  const expensesCtx = useAppSelector(selectExpenses);
+  const dispatch = useAppDispatch();
+
   useEffect(() => {
     const getExpenses = async () => {
       // get past expenses of the current user (ongoing, finished, cancelled(?) )
-      const expenseList: Expense[] = [];
-      await getDocs(
-        query(
-          collection(db, "expenses"),
-          or(
-            where("creator_id", "==", session.user.id),
-            where("users", "array-contains", session.user.id)
-          )
+      let expenseList: Expense[] = [];
+      // find the count of expense documents related to user in database, if the count is different than stored expense array length, it means there's new data
+      const queryStatement = query(
+        collection(db, "expenses"),
+        or(
+          where("creator_id", "==", session.user.id),
+          where("users", "array-contains", session.user.id)
         )
-      ).then((snapshot) => {
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          const exp: Expense = {
-            expense_id: doc.id,
-            creator_id: data.creator_id,
-            name: data.name,
-            date: data.date,
-            subtotal_amount: data.subtotal_amount,
-            total_amount: data.total_amount,
-            status: data.status,
-          };
+      );
+      const snapshot = await getCountFromServer(queryStatement);
+      if (snapshot.data().count === expensesCtx.length) {
+        console.log("expenses in local is up to date");
 
-          // find each of the expense items in database
-          // data.items.forEach(async (item: string) => {
-          //   await getDocs(
-          //     query(
-          //       collection(db, "expense-items"),
-          //       where("__name__", "==", item)
-          //     )
-          //   ).then((item_snapshot) => {
-          //     item_snapshot.forEach((item_doc) => {
-          //       const item_data = item_doc.data();
-          //       exp.items?.push({
-          //         item_id: item,
-          //         expense_id: item_data.expense_id,
-          //         name: item_data.name,
-          //         amount: item_data.amount,
-          //         quantity: item_data.quantity,
-          //         ordered_by: item_data.ordered_by, // should we only collect list of user_id or the users object list?
-          //       });
-          //     });
-          //   });
-          // });
+        expenseList = expensesCtx;
+      } else {
+        // must fetch the new data from database
+        await getDocs(queryStatement).then((snapshot) => {
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            const exp: Expense = {
+              expense_id: doc.id,
+              creator_id: data.creator_id,
+              name: data.name,
+              date: data.date,
+              subtotal_amount: data.subtotal_amount,
+              total_amount: data.total_amount,
+              status: data.status,
+              users: data.users,
+              items: data.items,
+              inviteId: data.inviteId,
+            };
+            // if this expense doesn't exist in the redux, then add it
+            if (!expensesCtx.some((expense) => expense.expense_id === doc.id)) {
+              dispatch(addExpense(exp));
+            }
 
-          expenseList.push(exp);
+            expenseList.push(exp);
+            // find each of the expense items in database
+            // data.items.forEach(async (item: string) => {
+            //   await getDocs(
+            //     query(
+            //       collection(db, "expense-items"),
+            //       where("__name__", "==", item)
+            //     )
+            //   ).then((item_snapshot) => {
+            //     item_snapshot.forEach((item_doc) => {
+            //       const item_data = item_doc.data();
+            //       exp.items?.push({
+            //         item_id: item,
+            //         expense_id: item_data.expense_id,
+            //         name: item_data.name,
+            //         amount: item_data.amount,
+            //         quantity: item_data.quantity,
+            //         ordered_by: item_data.ordered_by, // should we only collect list of user_id or the users object list?
+            //       });
+            //     });
+            //   });
+            // });
+          });
         });
-      });
+      }
 
       setExpenses(expenseList);
     };
