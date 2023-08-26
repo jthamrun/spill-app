@@ -11,46 +11,77 @@ import { XCircleIcon } from "@heroicons/react/24/outline";
 import { Expense } from "../store/types";
 import moment from "moment";
 import LoadingContext from "../store/loading-context/loading-context";
-import { doc, setDoc } from "firebase/firestore";
+import { deleteDoc, doc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase.config";
+import { useAppDispatch } from "../store/hooks";
+import { removeExpense, updateExpense } from "../store/expenses/expenseSlice";
+import { useRouter } from "next/navigation";
 
 // Define the props of Modal.
 type ModalProps = {
-  expense?: Expense;
+  expense: Expense;
   isOpen: boolean;
   setOn: Dispatch<SetStateAction<boolean>>;
 };
 // Modal component.
 const EditExpenseInfoModal = ({ expense, isOpen, setOn }: ModalProps) => {
+  const router = useRouter();
   const { isLoading, showLoader, hideLoader } = useContext(LoadingContext);
   // Manage button enabled/disabled state.
   const [disabled, setDisabled] = useState<boolean>(false);
-  const [name, setName] = useState("");
-  const [date, setDate] = useState<Date>();
-  const [subtotal, setSubtotal] = useState<number>(0);
-  const [tax, setTax] = useState<number>(0.1);
-  const [tips, setTips] = useState<number>(0);
+  const [name, setName] = useState(expense.name ?? "");
+  const [date, setDate] = useState<Date>(
+    new Date(expense.date ?? moment().format("YYYY-MM-DDT00:00"))
+  );
+  const [subtotal, setSubtotal] = useState<number>(
+    expense.subtotal_amount ?? 0
+  );
+  const [tax, setTax] = useState<number>(expense.tax_amount ?? 0.1);
+  const [tips, setTips] = useState<number>(expense.tip_amount ?? 0);
+
+  const dispatch = useAppDispatch();
 
   const saveExpenseInfo = async () => {
-    showLoader();
     try {
       await setDoc(
-        doc(db, "expenses", expense?.creator_id as string),
+        doc(db, "expenses", expense?.expense_id as string),
         {
-          name,
-          date: date?.toLocaleDateString(),
+          name: name,
+          date: date.toLocaleDateString(),
+          total_amount: subtotal * (1 + tax) + tips,
           subtotal_amount: subtotal,
           tip_amount: tips,
           tax_amount: tax,
         },
         { merge: true }
       );
+      dispatch(
+        updateExpense({
+          ...expense,
+          name: name,
+          date: date.toLocaleDateString(),
+          total_amount: subtotal * (1 + tax) + tips,
+          subtotal_amount: subtotal,
+          tip_amount: tips,
+          tax_amount: tax,
+        })
+      );
     } catch (err) {
     } finally {
       setTimeout(() => {
-        hideLoader();
         setOn(false);
       }, 1000);
+    }
+  };
+
+  const deleteExpenseInfo = async () => {
+    try {
+      await deleteDoc(doc(db, "expenses", expense.expense_id));
+      dispatch(removeExpense(expense.expense_id));
+    } catch (err) {
+    } finally {
+      setOn(false);
+      router.push("/expense/history");
     }
   };
 
@@ -78,7 +109,7 @@ const EditExpenseInfoModal = ({ expense, isOpen, setOn }: ModalProps) => {
               </label>
               <input
                 id="name"
-                value={expense?.name}
+                defaultValue={expense?.name}
                 onChange={(e) => {
                   setName(e.target.value);
                 }}
@@ -97,7 +128,7 @@ const EditExpenseInfoModal = ({ expense, isOpen, setOn }: ModalProps) => {
               </label>
               <input
                 id="date"
-                value={
+                defaultValue={
                   expense?.date && moment(expense.date).format("MM-DD-YYYY")
                 }
                 onChange={(e) => {
@@ -120,12 +151,12 @@ const EditExpenseInfoModal = ({ expense, isOpen, setOn }: ModalProps) => {
               </label>
               <CurrencyInput
                 id="subtotal"
-                value={expense?.subtotal_amount}
+                defaultValue={expense?.subtotal_amount}
                 prefix="$"
                 placeholder="Enter Subtotal"
                 decimalsLimit={2}
                 onValueChange={(val, _) => {
-                  val && setSubtotal(parseFloat(val));
+                  setSubtotal(parseFloat(val ?? "0"));
                 }}
                 className="font-quicksand font-medium border border-black rounded-md py-2 pl-4 pr-8 w-full"
               />
@@ -139,12 +170,12 @@ const EditExpenseInfoModal = ({ expense, isOpen, setOn }: ModalProps) => {
               </label>
               <CurrencyInput
                 id="tips"
-                value={expense?.tip_amount}
+                defaultValue={expense?.tip_amount}
                 prefix="$"
                 placeholder="Enter Tip"
                 decimalsLimit={2}
                 onValueChange={(val, _) => {
-                  val && setTips(parseFloat(val));
+                  setTips(parseFloat(val ?? "0"));
                 }}
                 className="font-quicksand font-medium border border-black rounded-md py-2 pl-4 pr-8 w-full"
               />
@@ -155,12 +186,12 @@ const EditExpenseInfoModal = ({ expense, isOpen, setOn }: ModalProps) => {
               </label>
               <CurrencyInput
                 id="tax"
-                value={expense?.tax_amount}
+                defaultValue={(expense?.tax_amount as number) * 100}
                 suffix="%"
                 placeholder="Enter Tax"
                 decimalsLimit={2}
                 onValueChange={(val, _) => {
-                  val && setTax(parseFloat(val) / 100);
+                  setTax(parseFloat(val ?? "0") / 100);
                 }}
                 className="font-quicksand font-medium border border-black rounded-md py-2 pl-4 pr-8 w-full"
               />
@@ -184,6 +215,7 @@ const EditExpenseInfoModal = ({ expense, isOpen, setOn }: ModalProps) => {
             </button>
             <button
               className="border border-black rounded-md py-2 px-4 bg-error-red"
+              onClick={deleteExpenseInfo}
               disabled={disabled}
             >
               <p className="font-quicksand font-bold">Delete</p>

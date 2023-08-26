@@ -11,6 +11,8 @@ import { ExpenseItemGroup } from "../store/types";
 import AddPersonToItemCardModal from "./AddPersonToItemCardModal";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase.config";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { selectExpenseItemGroups, updateExpenseItemGroup } from "../store/expenses/expenseSlice";
 
 type Props = {
   group?: ExpenseItemGroup;
@@ -27,12 +29,7 @@ function ExpenseItemCard({
 }: Props) {
   const didRender = useRef<boolean>(false);
   const [isAddPersonModal, setIsAddPersonModal] = useState(false);
-  const [group, setGroup] = useState<ExpenseItemGroup>({
-    group_id: "u2131ms",
-    item_id: "313sserkr",
-    splitOption: "equal",
-    splitAmount: [],
-  });
+  const [group, setGroup] = useState<ExpenseItemGroup>(personGroup!);
 
   const [isGroupEdited, setIsGroupEdited] = useState<boolean>(false);
   const [loadingSpinner, setLoadingSpinner] = useState<boolean>(false);
@@ -40,30 +37,34 @@ function ExpenseItemCard({
     group.splitOption == "equal"
   );
 
+  const expenseItemGroups = useAppSelector(selectExpenseItemGroups);
+  const dispatch = useAppDispatch();
+
   const setEqualSplitHandler = () => {
-    equalSplit
-      ? setGroup((prev) => {
-          return {
-            ...prev,
-            splitOption: "individual",
-          };
-        })
-      : setGroup((prev) => {
-          return {
-            ...prev,
-            splitOption: "equal",
-            splitAmount:
-              prev.splitAmount?.map((user) => {
-                return {
-                  ...user,
-                  total_amount:
-                    Math.floor(
-                      ((itemAmount ?? 11.99) / prev.splitAmount!.length) * 100
-                    ) / 100,
-                };
-              }) ?? [],
-          };
-        });
+    let result : ExpenseItemGroup;
+    if (equalSplit) {
+      result = {
+        ...group,
+        splitOption: "individual"
+      }
+    } else {
+      result = {
+        ...group,
+        splitOption: "equal",
+        splitAmount:
+          group.splitAmount?.map((user) => {
+            return {
+              ...user,
+              total_amount:
+                Math.floor(
+                  ((itemAmount ?? 11.99) / group.splitAmount!.length) * 100
+                ) / 100,
+            };
+          }) ?? [],
+      }
+    }
+    setGroup(result);
+    dispatch(updateExpenseItemGroup(result));
 
     setEqualSplit((prev) => !prev);
   };
@@ -71,18 +72,19 @@ function ExpenseItemCard({
   const updateGroupInFirestore = async () => {
     try {
       setLoadingSpinner(true);
-      console.log("updating group in firestore...");
 
-      // await setDoc(
-      //   doc(db, "expense-item-groups", group.group_id as string),
-      //   {
-      //     splitAmount: group.splitAmount,
-      //     splitOption: group.splitOption,
-      //   },
-      //   {
-      //     merge: true,
-      //   }
-      // );
+      await setDoc(
+        doc(db, "expense-item-groups", group.group_id as string),
+        {
+          splitAmount: group.splitAmount,
+          splitOption: group.splitOption,
+        },
+        {
+          merge: true,
+        }
+      );
+
+      dispatch(updateExpenseItemGroup(group))
     } catch (err) {
     } finally {
       setLoadingSpinner(false);
@@ -113,22 +115,24 @@ function ExpenseItemCard({
   useEffect(() => {
     // update equal amount when the number of users involved in group changes
 
-    equalSplit &&
-      setGroup((prev) => {
-        return {
-          ...prev,
-          splitAmount:
-            prev.splitAmount?.map((user) => {
-              return {
-                ...user,
-                total_amount:
-                  Math.floor(
-                    ((itemAmount ?? 11.99) / prev.splitAmount!.length) * 100
-                  ) / 100,
-              };
-            }) ?? [],
-        };
-      });
+    if(equalSplit){
+      const result = {
+        ...group,
+        splitAmount:
+          group.splitAmount?.map((user) => {
+            return {
+              ...user,
+              total_amount:
+                Math.floor(
+                  ((itemAmount ?? 11.99) / group.splitAmount!.length) * 100
+                ) / 100,
+            };
+          }) ?? [],
+      };
+      setGroup(result);
+      dispatch(updateExpenseItemGroup(result))
+    }
+      
   }, [group.splitAmount?.length]);
 
   return (

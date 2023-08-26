@@ -29,7 +29,7 @@ function ExpenseCard({ expense }: Props) {
             : "07/29/2023"}
         </p>
         <p className="font-quicksand font-bold text-xl group-hover:text-white">
-          ${expense?.total_amount ?? "11.22"}
+          ${(expense?.total_amount)?.toFixed(2) ?? "11.22"}
         </p>
       </div>
     </div>

@@ -21,6 +21,13 @@ import { db } from "../../firebase.config";
 import LoadingContext from "../store/loading-context/loading-context";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import {
+  addExpenseItem,
+  removeExpenseItem,
+  selectExpenseItems,
+  updateExpenseItem,
+} from "../store/expenses/expenseSlice";
 
 type Props = {
   id: string;
@@ -38,27 +45,46 @@ function ExpenseItemMenu({ id, items, currentUser, creatorId }: Props) {
 
   const [itemsList, setItemsList] = useState<ExpenseItem[]>([]);
 
-  const getExpenseItems = async () => {
-    const itemsList: ExpenseItem[] = [];
-    // set the items atrribute respectively
+  const expenseItems = useAppSelector(selectExpenseItems);
+  const dispatch = useAppDispatch();
 
-    items.forEach(async (item: string) => {
-      getDoc(doc(db, "expense-items", item)).then((snap) => {
-        if (snap.exists()) {
-          const data = snap.data()!;
-          itemsList.push({
-            item_id: snap.id,
-            expense_id: data.expense_id,
-            name: data.name,
-            amount: parseInt(data.amount),
-            quantity: parseInt(data.quantity),
-            groups: data.groups,
-          });
+  const getExpenseItems = async () => {
+    showLoader();
+    try {
+      const itemsList: ExpenseItem[] = [];
+      // set the items atrribute respectively
+
+      items.forEach(async (item: string) => {
+        if (expenseItems.some((expenseItem) => expenseItem.item_id === item)) {
+          // then we know expense item is available in redux
+          itemsList.push(
+            expenseItems.find((expenseItem) => expenseItem.item_id === item)!
+          );
+        } else {
+          const snap = await getDoc(doc(db, "expense-items", item));
+          if (snap.exists()) {
+            const data = snap.data()!;
+            const expenseItem = {
+              item_id: snap.id,
+              expense_id: data.expense_id,
+              name: data.name,
+              amount: parseInt(data.amount),
+              quantity: parseInt(data.quantity),
+              groups: data.groups,
+            };
+            itemsList.push(expenseItem);
+            dispatch(addExpenseItem(expenseItem));
+          }
         }
       });
-    });
 
-    setItemsList(itemsList);
+      setItemsList(itemsList);
+    } catch (err) {
+    } finally {
+      setTimeout(() => {
+        hideLoader();
+      }, 1000);
+    }
   };
 
   const deleteExpenseItem = async (item: ExpenseItem) => {
@@ -68,6 +94,7 @@ function ExpenseItemMenu({ id, items, currentUser, creatorId }: Props) {
       // console.log("Deleting");
       await deleteDoc(doc(db, "expense-items", item.item_id));
       setItemsList((prev) => prev.filter((i) => i.item_id !== item.item_id));
+      dispatch(removeExpenseItem(item.item_id));
     } catch (err) {
       toast.error("Error Deleting", {
         autoClose: 2000, //2 seconds
@@ -93,18 +120,20 @@ function ExpenseItemMenu({ id, items, currentUser, creatorId }: Props) {
     const itemsArray: ExpenseItem[] = itemsList;
     snapshot.forEach((doc) => {
       const item_data = doc.data();
+      const expenseItem = {
+        item_id: doc.id,
+        expense_id: item_data.expense_id,
+        name: item_data.name,
+        amount: parseInt(item_data.amount),
+        quantity: parseInt(item_data.quantity),
+        groups: item_data.groups,
+      } as ExpenseItem;
       itemsArray.splice(
         itemsArray.findIndex((item) => item.item_id === doc.id),
         1,
-        {
-          item_id: doc.id,
-          expense_id: item_data.expense_id,
-          name: item_data.name,
-          amount: parseInt(item_data.amount),
-          quantity: parseInt(item_data.quantity),
-          groups: item_data.groups,
-        } as ExpenseItem
+        expenseItem
       );
+      dispatch(updateExpenseItem(expenseItem));
     });
 
     setItemsList(itemsArray);
@@ -185,21 +214,6 @@ function ExpenseItemMenu({ id, items, currentUser, creatorId }: Props) {
             creatorId={creatorId}
           />
         ))}
-        <ExpenseItemMenuCard
-          onDelete={deleteExpenseItem}
-          currentUser={currentUser}
-          creatorId={creatorId}
-        />
-        <ExpenseItemMenuCard
-          onDelete={deleteExpenseItem}
-          currentUser={currentUser}
-          creatorId={creatorId}
-        />
-        <ExpenseItemMenuCard
-          onDelete={deleteExpenseItem}
-          currentUser={currentUser}
-          creatorId={creatorId}
-        />
       </div>
     </div>
   );

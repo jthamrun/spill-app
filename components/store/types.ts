@@ -46,6 +46,9 @@ export type Expense = {
   tax_amount?: number;
   tip_amount?: number;
   status: string;
+  users?: string[];
+  items?: string[];
+  inviteId?: string;
 };
 
 // DATABASE VIEW (1st proposal)

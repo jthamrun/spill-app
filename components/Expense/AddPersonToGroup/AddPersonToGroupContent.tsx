@@ -6,6 +6,8 @@ import PersonGroupInfoCard from "./PersonGroupInfoCard";
 import { ExpenseItemGroup, User, UserExpenseGroup } from "../../store/types";
 import { db } from "../../../firebase.config";
 import PersonGroupInfoCarouselCard from "./PersonGroupInfoCarouselCard";
+import { useAppDispatch } from "../../store/hooks";
+import { updateExpenseItemGroup } from "../../store/expenses/expenseSlice";
 
 type Props = {
   placeholder: string;
@@ -17,6 +19,8 @@ function AddPersonToGroupContent({ placeholder, group, setGroup }: Props) {
   const [search, setSearch] = useState("");
   const [people, setPeople] = useState<User[]>([]);
 
+  const dispatch = useAppDispatch();
+
   const addPerson = (id: string, name: string) => {
     setPeople((prev) => prev.filter((user) => user.id !== id));
     setGroup((prev) => {
@@ -26,6 +30,12 @@ function AddPersonToGroupContent({ placeholder, group, setGroup }: Props) {
         name,
         total_amount: 0,
       } as UserExpenseGroup);
+      dispatch(
+        updateExpenseItemGroup({
+          ...prev,
+          splitAmount: arr,
+        })
+      );
       return {
         ...prev,
         splitAmount: arr,
@@ -45,6 +55,12 @@ function AddPersonToGroupContent({ placeholder, group, setGroup }: Props) {
       ];
     });
     setGroup((prev) => {
+      dispatch(
+        updateExpenseItemGroup({
+          ...prev,
+          splitAmount: prev.splitAmount?.filter((user) => user.user_id !== id),
+        })
+      );
       return {
         ...prev,
         splitAmount: prev.splitAmount?.filter((user) => user.user_id !== id),
@@ -63,7 +79,12 @@ function AddPersonToGroupContent({ placeholder, group, setGroup }: Props) {
         }
         return user;
       });
-
+      dispatch(
+        updateExpenseItemGroup({
+          ...prev,
+          splitAmount: userGroupList,
+        })
+      );
       return {
         ...prev,
         splitAmount: userGroupList,
