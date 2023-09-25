@@ -17,7 +17,7 @@ import EditExpenseInfoModal from "./EditExpenseInfoModal";
 import moment from "moment";
 import LoadingContext from "../store/loading-context/loading-context";
 import { useParams, useRouter } from "next/navigation";
-import { randomUUID } from "crypto";
+import crypto from "crypto";
 import { ToastContainer, toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
@@ -201,7 +201,9 @@ const EditExpenseComponent = ({ currentUser }: Props) => {
     try {
       let invite_id: string = inviteId;
       if (!invite_id) {
-        invite_id = randomUUID();
+        console.log('not found!');
+        
+        invite_id = crypto.randomBytes(16).toString('hex');
 
         await setDoc(
           doc(db, "expenses", id),
@@ -224,6 +226,7 @@ const EditExpenseComponent = ({ currentUser }: Props) => {
 
       setIsInviteCopied(true);
     } catch (err) {
+      console.log(err)
       // error with either uploading new invite to DB or copying invite to clipboard
       toast.error("Error Copying", {
         autoClose: 2000, //2 seconds
